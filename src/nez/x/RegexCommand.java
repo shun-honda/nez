@@ -74,7 +74,7 @@ public class RegexCommand extends Command {
 				rec.log();
 			}
 			if (writeAST) {
-				//trans.transform(config.getOutputFileName(file), node);
+				trans.transform(config.getOutputFileName(file), node);
 				ConsoleUtils.println("nez: match");
 			}
 		}

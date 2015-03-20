@@ -60,7 +60,9 @@ public class RegexConverter extends GrammarConverter{
 	}
 	
 	public void convert(AST e) {
-		grammar.defineRule(e, "File", pi(e, null));
+		UList<Expression> pattern = new UList<Expression>(new Expression[1]);
+		pattern.add(pi(e, null));
+		grammar.defineRule(e, "File", Factory.newNew(e, pattern));
 		//System.out.println("\nConverted Rule: " + grammar.getResourceName());
 		//grammar.dump();
 		makeFile(e);
@@ -91,6 +93,24 @@ public class RegexConverter extends GrammarConverter{
 	// pi(e1e2, k) = pi(e1, pi(e2, k))
 	public Expression piConcatenation(AST e, Expression k) {
 		return pi(e.get(0), pi(e.get(1), k));
+	}
+
+	// pi((e1|e2), k) = pi((e1)|(e2), k)
+	// pi((e), k) = @{ pi(e, "") } k
+	public Expression piCapture(AST e, Expression k) {
+		AST child = e.get(0);
+		if (child.getTag().equals(Tag.tag("Or"))) {
+			Node capLeft = child.newNode(Tag.tag("Capture"), e.getSource(), 0, 0, 1);
+			Node capRight = child.newNode(Tag.tag("Capture"), e.getSource(), 0, 0, 1);
+			capLeft.link(0, child.get(0));
+			capRight.link(0, child.get(1));
+			child.link(0, capLeft);
+			child.link(1, capRight);
+			return pi(child, k);
+		}
+		else {
+			return toSeq(e, toNew(e.get(0), toEmpty(e)), k);
+		}
 	}
 
 	// pi((?>e), k) = pi(e, "") k
@@ -253,6 +273,12 @@ public class RegexConverter extends GrammarConverter{
 			Factory.addSequence(l, k);
 		}
 		return Factory.newSequence(null, l);
+	}
+
+	public Expression toNew(AST e, Expression k) {
+		UList<Expression> l = new UList<Expression>(new Expression[1]);
+		Factory.addSequence(l, pi(e, k));
+		return Factory.newLink(null, Factory.newNew(null, l), -1);
 	}
 
 	@Override
