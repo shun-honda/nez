@@ -6,16 +6,15 @@ import java.util.TreeMap;
 
 import nez.util.ConsoleUtils;
 
-
 public abstract class Command {
-	public final static String  ProgName  = "Nez";
-	public final static String  CodeName  = "yokohama";
-	public final static int     MajorVersion = 1;
-	public final static int     MinerVersion = 0;
-	public final static int     PatchLevel   = 0;
-	public final static String  Version = "" + MajorVersion + "." + MinerVersion + "." + PatchLevel;
-	public final static String  Copyright = "Copyright (c) 2014-2015, Nez project authors";
-	public final static String  License = "BSD-Style Open Source";
+	public final static String ProgName = "Nez";
+	public final static String CodeName = "yokohama";
+	public final static int MajorVersion = 1;
+	public final static int MinerVersion = 0;
+	public final static int PatchLevel = 0;
+	public final static String Version = "" + MajorVersion + "." + MinerVersion + "." + PatchLevel;
+	public final static String Copyright = "Copyright (c) 2014-2015, Nez project authors";
+	public final static String License = "BSD-Style Open Source";
 
 	public final static void main(String[] args) {
 		CommandConfigure config = new CommandConfigure();
@@ -25,32 +24,31 @@ public abstract class Command {
 	}
 
 	public abstract void exec(CommandConfigure config);
-	
+
 	public final static void displayVersion() {
 		ConsoleUtils.println(ProgName + "-" + Version + " (" + CodeName + ") on Java JVM-" + System.getProperty("java.version"));
 		ConsoleUtils.println(Copyright);
 	}
-	
+
 	private static jline.ConsoleReader ConsoleReader = null;
 
 	public final static String readMultiLine(String prompt, String prompt2) {
-		if(ConsoleReader == null) {
+		if (ConsoleReader == null) {
 			displayVersion();
 			try {
 				ConsoleReader = new jline.ConsoleReader();
-			}
-			catch(IOException e) {
+			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
 		StringBuilder sb = new StringBuilder();
 		String line;
-		while(true) {
+		while (true) {
 			line = readSingleLine(prompt);
-			if(line == null) {
+			if (line == null) {
 				return null;
 			}
-			if(!line.endsWith("\\")) {
+			if (!line.endsWith("\\")) {
 				sb.append(line);
 				break;
 			}
@@ -66,23 +64,21 @@ public abstract class Command {
 	private final static String readSingleLine(String prompt) {
 		try {
 			return ConsoleReader.readLine(prompt);
-		}
-		catch(IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 
 	// command database 
-	
-	private static TreeMap<String,Command> commandTable = new TreeMap<String,Command>();
+
+	private static TreeMap<String, Command> commandTable = new TreeMap<String, Command>();
 
 	public static void load(String name, String className) {
 		try {
 			Class<?> c = Class.forName(className);
-			commandTable.put(name, (Command)c.newInstance());
-		}
-		catch(Exception e) {
+			commandTable.put(name, (Command) c.newInstance());
+		} catch (Exception e) {
 			Verbose.println("undefined command: " + name + " due to " + e);
 		}
 	}
@@ -98,14 +94,15 @@ public abstract class Command {
 		load("demo", "nez.x.DemoCommand");
 		load("type", "nez.x.TypeCommand");
 		load("dtd", "nez.x.DTDCommand");
+		load("minivm", "nez.x.minivm.MiniVMCommand");
 	}
-	
+
 	public static final Command getCommand(String name) {
 		return commandTable.get(name);
 	}
 
 	public static void showList() {
-		for(Entry<String,Command> e : commandTable.entrySet()) {
+		for (Entry<String, Command> e : commandTable.entrySet()) {
 			Command c = e.getValue();
 			ConsoleUtils.println(String.format("  %8s - %s", e.getKey(), c.getDesc()));
 		}
@@ -114,4 +111,3 @@ public abstract class Command {
 	public abstract String getDesc();
 
 }
-

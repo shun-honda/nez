@@ -30,10 +30,10 @@ public class CommandConfigure {
 	public String Expression = null;
 
 	// -s, --start
-	public String StartingPoint = "File";  // default
-	
+	public String StartingPoint = "File"; // default
+
 	// -i, --input
-	private int InputFileIndex = -1;  // shell mode
+	private int InputFileIndex = -1; // shell mode
 	public UList<String> InputFileLists = new UList<String>(new String[2]);
 
 	// -t, --text
@@ -44,13 +44,13 @@ public class CommandConfigure {
 
 	// -W
 	public int WarningLevel = 1;
-	
+
 	// -g
 	public int DebugLevel = 1;
-	
+
 	// --verbose
-	public boolean VerboseMode    = false;
-	
+	public boolean VerboseMode = false;
+
 	// -O
 	public int OptimizationLevel = 2;
 
@@ -77,14 +77,14 @@ public class CommandConfigure {
 		Command.showList();
 		ConsoleUtils.exit(0, Message);
 	}
-	
+
 	private int WindowSize = 32;
 	private MemoTable defaultTable = MemoTable.newElasticTable(0, 0, 0);
-	
+
 	public void parseCommandOption(String[] args) {
 		int index = 0;
-		if(args.length > 0) {
-			if(!args[0].startsWith("-")) {
+		if (args.length > 0) {
+			if (!args[0].startsWith("-")) {
 				CommandName = args[0];
 				index = 1;
 			}
@@ -121,7 +121,7 @@ public class CommandConfigure {
 			}
 			else if ((argument.equals("-i") || argument.equals("--input")) && (index < args.length)) {
 				InputFileLists = new UList<String>(new String[4]);
-				while(index < args.length && !args[index].startsWith("-")) {
+				while (index < args.length && !args[index].startsWith("-")) {
 					InputFileLists.add(args[index]);
 					index = index + 1;
 					InputFileIndex = 0;
@@ -135,94 +135,94 @@ public class CommandConfigure {
 				StartingPoint = args[index];
 				index = index + 1;
 			}
-//			else if (argument.startsWith("-O")) {
-//				OptimizationLevel = StringUtils.parseInt(argument.substring(2), 2);
-//			}
+			else if (argument.startsWith("-O")) {
+				OptimizationLevel = StringUtils.parseInt(argument.substring(2), 2);
+			}
 //			else if (argument.startsWith("-W")) {
 //				WarningLevel = StringUtils.parseInt(argument.substring(2), 2);
 //			}
 //			else if (argument.startsWith("-g")) {
 //				DebugLevel = StringUtils.parseInt(argument.substring(2), 1);
 //			}
-			else if(argument.startsWith("--memo")) {
-				if(argument.equals("--memo:none")) {
+			else if (argument.startsWith("--memo")) {
+				if (argument.equals("--memo:none")) {
 					ProductionOption = UFlag.unsetFlag(ProductionOption, Production.PackratParsing);
 				}
-				else if(argument.equals("--memo:packrat")) {
+				else if (argument.equals("--memo:packrat")) {
 					defaultTable = MemoTable.newPackratHashTable(0, 0, 0);
 				}
 				else {
 					int w = StringUtils.parseInt(argument.substring(7), -1);
-					if(w >= 0) {
-						WindowSize  = w;
+					if (w >= 0) {
+						WindowSize = w;
 					}
 					else {
 						showUsage("unknown option: " + argument);
 					}
 				}
 			}
-			else if(argument.startsWith("--enable:")) {
-				if(argument.endsWith("packrat")) {
+			else if (argument.startsWith("--enable:")) {
+				if (argument.endsWith("packrat")) {
 					this.ProductionOption |= Production.PackratParsing;
 					defaultTable = MemoTable.newPackratHashTable(0, 0, 0);
 				}
-				else if(argument.endsWith(":prediction") || argument.endsWith(":predict")) {
+				else if (argument.endsWith(":prediction") || argument.endsWith(":predict")) {
 					this.ProductionOption |= Production.Prediction;
 				}
-				else if(argument.endsWith(":tracing") || argument.endsWith(":trace")) {
+				else if (argument.endsWith(":tracing") || argument.endsWith(":trace")) {
 					this.ProductionOption |= Production.Tracing;
 				}
-				else if(argument.endsWith(":inline")) {
+				else if (argument.endsWith(":inline")) {
 					this.ProductionOption |= Production.Inlining;
 				}
-				else if(argument.endsWith(":dfa")) {
+				else if (argument.endsWith(":dfa")) {
 					this.ProductionOption |= Production.DFA;
 				}
-				else if(argument.endsWith(":log")) {
-					RecorderFileName = "nezrec.csv";  // -Xrec
+				else if (argument.endsWith(":log")) {
+					RecorderFileName = "nezrec.csv"; // -Xrec
 				}
 			}
-			else if(argument.startsWith("--disable:")) {
-				if(argument.endsWith(":packrat") || argument.endsWith(":memo")) {
+			else if (argument.startsWith("--disable:")) {
+				if (argument.endsWith(":packrat") || argument.endsWith(":memo")) {
 					this.ProductionOption = UFlag.unsetFlag(this.ProductionOption, Production.PackratParsing);
 				}
-				else if(argument.endsWith(":tracing") || argument.endsWith(":trace")) {
+				else if (argument.endsWith(":tracing") || argument.endsWith(":trace")) {
 					this.ProductionOption = UFlag.unsetFlag(this.ProductionOption, Production.Tracing);
 				}
-				else if(argument.endsWith(":prediction") || argument.endsWith(":predict")) {
+				else if (argument.endsWith(":prediction") || argument.endsWith(":predict")) {
 					this.ProductionOption = UFlag.unsetFlag(this.ProductionOption, Production.Prediction);
 				}
-				else if(argument.endsWith(":inline")) {
+				else if (argument.endsWith(":inline")) {
 					this.ProductionOption = UFlag.unsetFlag(this.ProductionOption, Production.Inlining);
 				}
-				else if(argument.endsWith(":dfa")) {
+				else if (argument.endsWith(":dfa")) {
 					this.ProductionOption = UFlag.unsetFlag(this.ProductionOption, Production.DFA);
 				}
 			}
-			else if(argument.startsWith("-Xrec")) {
+			else if (argument.startsWith("-Xrec")) {
 				RecorderFileName = "nezrec.csv";
-				if(argument.endsWith(".csv")) {
+				if (argument.endsWith(".csv")) {
 					RecorderFileName = argument.substring(6);
 				}
 				Verbose.println("recording " + RecorderFileName);
 			}
-			else if(argument.startsWith("--verbose")) {
-				if(argument.equals("--verbose:memo")) {
+			else if (argument.startsWith("--verbose")) {
+				if (argument.equals("--verbose:memo")) {
 					Verbose.PackratParsing = true;
 				}
-				else if(argument.equals("--verbose:peg")) {
+				else if (argument.equals("--verbose:peg")) {
 					Verbose.Grammar = true;
 				}
-				else if(argument.equals("--verbose:vm")) {
+				else if (argument.equals("--verbose:vm")) {
 					Verbose.VirtualMachine = true;
 				}
-				else if(argument.equals("--verbose:debug")) {
+				else if (argument.equals("--verbose:debug")) {
 					Verbose.Debug = true;
 				}
-				else if(argument.equals("--verbose:backtrack")) {
+				else if (argument.equals("--verbose:backtrack")) {
 					Verbose.Backtrack = true;
 				}
-				else if(argument.equals("--verbose:none")) {
+				else if (argument.equals("--verbose:none")) {
 					Verbose.General = false;
 				}
 				else {
@@ -238,14 +238,14 @@ public class CommandConfigure {
 
 	public final Command getCommand() {
 		Command com = Command.getCommand(this.CommandName);
-		if(com == null) {
+		if (com == null) {
 			this.showUsage("unknown command: " + this.CommandName);
 		}
 		return com;
 	}
-	
+
 	public final Grammar getGrammar() {
-		if(GrammarFile != null) {
+		if (GrammarFile != null) {
 			try {
 				NezParser p = new NezParser();
 				return p.load(SourceContext.loadSource(GrammarFile), new GrammarChecker(this.OptimizationLevel));
@@ -253,7 +253,7 @@ public class CommandConfigure {
 				ConsoleUtils.exit(1, "cannot open " + GrammarFile + "; " + e.getMessage());
 			}
 		}
-		if(GrammarText != null) {
+		if (GrammarText != null) {
 			NezParser p = new NezParser();
 			return p.load(SourceContext.newStringSourceContext(GrammarText), new GrammarChecker(this.OptimizationLevel));
 		}
@@ -262,7 +262,7 @@ public class CommandConfigure {
 	}
 
 	public final Grammar newGrammar() {
-		if(GrammarFile != null) {
+		if (GrammarFile != null) {
 			try {
 				NezParser p = new NezParser();
 				return p.load(SourceContext.loadSource(GrammarFile), new GrammarChecker(this.OptimizationLevel));
@@ -270,7 +270,7 @@ public class CommandConfigure {
 				ConsoleUtils.exit(1, "cannot open " + GrammarFile + "; " + e.getMessage());
 			}
 		}
-		if(GrammarText != null) {
+		if (GrammarText != null) {
 			NezParser p = new NezParser();
 			return p.load(SourceContext.newStringSourceContext(GrammarText), new GrammarChecker(this.OptimizationLevel));
 		}
@@ -278,17 +278,17 @@ public class CommandConfigure {
 	}
 
 	public final Production getProduction(String start, int option) {
-		if(start == null) {
+		if (start == null) {
 			start = this.StartingPoint;
 		}
 		return getGrammar().getProduction(start, option);
 	}
 
 	private int ProductionOption = Production.DefaultOption;
-	
+
 	public final Production getProduction(String start) {
 		Production p = getGrammar().getProduction(start, ProductionOption);
-		if(p == null) {
+		if (p == null) {
 			ConsoleUtils.exit(1, "undefined nonterminal: " + start);
 		}
 		p.config(this.defaultTable, WindowSize);
@@ -300,27 +300,27 @@ public class CommandConfigure {
 	}
 
 	public final boolean hasInput() {
-		if(this.InputFileIndex == -1) {
+		if (this.InputFileIndex == -1) {
 			this.InputText = Command.readMultiLine(">>> ", "... ");
 			return this.InputText != null;
 		}
 		return this.InputText != null || this.InputFileIndex < this.InputFileLists.size();
 	}
-	
+
 	public final void setInputFileList(UList<String> list) {
 		this.InputFileIndex = 0;
 		this.InputFileLists = list;
 	}
 
 	public final SourceContext getInputSourceContext() {
-		if(this.InputText != null) {
+		if (this.InputText != null) {
 			String text = this.InputText;
 			this.InputText = null;
 			return SourceContext.newStringSourceContext(text);
 		}
-		if(this.InputFileIndex < this.InputFileLists.size()) {
+		if (this.InputFileIndex < this.InputFileLists.size()) {
 			String f = this.InputFileLists.ArrayValues[this.InputFileIndex];
-			this.InputFileIndex ++;
+			this.InputFileIndex++;
 			try {
 				return SourceContext.loadSource(f);
 			} catch (IOException e) {
@@ -341,7 +341,7 @@ public class CommandConfigure {
 	public String RecorderFileName = null;
 
 	public final Recorder getRecorder() {
-		if(RecorderFileName != null) {
+		if (RecorderFileName != null) {
 			Recorder rec = new Recorder(RecorderFileName);
 			rec.setText("nez", Command.Version);
 			rec.setText("config", Production.stringfyOption(ProductionOption, ";"));
@@ -351,4 +351,3 @@ public class CommandConfigure {
 	}
 
 }
-
