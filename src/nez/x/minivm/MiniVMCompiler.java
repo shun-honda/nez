@@ -486,9 +486,6 @@ public class MiniVMCompiler extends GrammarVisitor {
 		if (charCount <= 1) {
 			fbb = new BasicBlock();
 			this.pushFailureJumpPoint(fbb);
-			if (!UnaryChoice) {
-				this.builder.createPUSHpos(e);
-			}
 			e.get(index).visit(this);
 			this.backTrackFlag = true;
 			this.currentFailBB = fbb;
@@ -499,9 +496,6 @@ public class MiniVMCompiler extends GrammarVisitor {
 			fbb = new BasicBlock();
 			this.currentFailBB = fbb;
 			this.pushFailureJumpPoint(fbb);
-			if (!UnaryChoice) {
-				this.builder.createPUSHpos(e);
-			}
 		}
 		writeCharsetCode(e, index, charCount);
 		return index + charCount - 1;
@@ -675,16 +669,29 @@ public class MiniVMCompiler extends GrammarVisitor {
 			if (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.ChoiceNot)) {
 				BasicBlock fbb = new BasicBlock();
 				this.pushFailureJumpPoint(fbb);
-				this.builder.createPUSHpos(e);
+//				this.builder.createPUSHpos(e);
 				e.get(0).visit(this);
-				this.builder.createSTOREpos(e);
-				this.builder.createJUMP(e, this.jumpPrevFailureJump());
-				this.popFailureJumpPoint(e);
-				this.setInsertPoint(fbb);
-				this.builder.setCurrentBB(fbb);
-				this.builder.createSTOREpos(e);
-				this.builder.createSTOREflag(e, 0);
-				return;
+				if (this.lastChoiceElementIsUnary) {
+					this.builder.createSTOREpos(e);
+					this.builder.createSTOREflag(e, 1);
+					this.builder.createJUMP(e, this.jumpPrevFailureJump());
+					this.popFailureJumpPoint(e);
+					this.setInsertPoint(fbb);
+					this.builder.setCurrentBB(fbb);
+					this.builder.createGETpos(e);
+					this.builder.createSTOREflag(e, 0);
+					return;
+				}
+				else {
+					this.builder.createGETpos(e);
+					this.builder.createJUMP(e, this.jumpPrevFailureJump());
+					this.popFailureJumpPoint(e);
+					this.setInsertPoint(fbb);
+					this.builder.setCurrentBB(fbb);
+					this.builder.createGETpos(e);
+					this.builder.createSTOREflag(e, 0);
+					return;
+				}
 			}
 		}
 		BasicBlock fbb = new BasicBlock();
@@ -817,16 +824,25 @@ public class MiniVMCompiler extends GrammarVisitor {
 				BasicBlock fbb = new BasicBlock();
 				BasicBlock mergebb = new BasicBlock();
 				this.pushFailureJumpPoint(fbb);
-				this.builder.createPUSHpos(e);
 				e.get(0).visit(this);
-				this.builder.createPOPpos(e);
-				this.builder.createJUMP(e, mergebb);
-				this.popFailureJumpPoint(e);
-				this.setInsertPoint(fbb);
-				this.builder.createSTOREflag(e, 0);
-				this.builder.createSTOREpos(e);
-				this.builder.setCurrentBB(mergebb);
-				this.setInsertPoint(mergebb);
+				if (this.lastChoiceElementIsUnary) {
+					this.builder.createJUMP(e, mergebb);
+					this.popFailureJumpPoint(e);
+					this.setInsertPoint(fbb);
+					this.builder.createSTOREflag(e, 0);
+					this.builder.createGETpos(e);
+					this.builder.setCurrentBB(mergebb);
+					this.setInsertPoint(mergebb);
+				}
+				else {
+					this.builder.createJUMP(e, mergebb);
+					this.popFailureJumpPoint(e);
+					this.setInsertPoint(fbb);
+					this.builder.createSTOREflag(e, 0);
+					this.builder.createGETpos(e);
+					this.builder.setCurrentBB(mergebb);
+					this.setInsertPoint(mergebb);
+				}
 				return;
 			}
 		}
@@ -953,26 +969,35 @@ public class MiniVMCompiler extends GrammarVisitor {
 	}
 
 	private void writeRepetitionCode(Repetition e) {
-		if (this.option.useFlowAnalysis) {
-			if (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.ChoiceRepetition)) {
-				BasicBlock bb = new BasicBlock(this.func);
-				BasicBlock fbb = new BasicBlock();
-				BasicBlock mergebb = new BasicBlock();
-				this.pushFailureJumpPoint(fbb);
-				this.builder.setCurrentBB(bb);
-				this.builder.createPUSHpos(e);
-				e.get(0).visit(this);
-				this.builder.createPOPpos(e);
-				this.builder.createJUMP(e, bb);
-				this.popFailureJumpPoint(e);
-				this.setInsertPoint(fbb);
-				this.builder.createSTOREflag(e, 0);
-				this.builder.createSTOREpos(e);
-				this.setInsertPoint(mergebb);
-				this.builder.setCurrentBB(mergebb);
-				return;
-			}
-		}
+//		if (this.option.useFlowAnalysis) {
+//			if (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.ChoiceRepetition)) {
+//				BasicBlock bb = new BasicBlock(this.func);
+//				BasicBlock fbb = new BasicBlock();
+//				BasicBlock mergebb = new BasicBlock();
+//				this.pushFailureJumpPoint(fbb);
+//				this.builder.setCurrentBB(bb);
+//				e.get(0).visit(this);
+//				if (this.lastChoiceElementIsUnary) {
+//					this.builder.createJUMP(e, bb);
+//					this.popFailureJumpPoint(e);
+//					this.setInsertPoint(fbb);
+//					this.builder.createSTOREflag(e, 0);
+//					this.builder.createSTOREpos(e);
+//					this.setInsertPoint(mergebb);
+//					this.builder.setCurrentBB(mergebb);
+//				}
+//				else {
+//					this.builder.createJUMP(e, bb);
+//					this.popFailureJumpPoint(e);
+//					this.setInsertPoint(fbb);
+//					this.builder.createSTOREflag(e, 0);
+//					this.builder.createGETpos(e);
+//					this.setInsertPoint(mergebb);
+//					this.builder.setCurrentBB(mergebb);
+//				}
+//				return;
+//			}
+//		}
 		BasicBlock bb = new BasicBlock(this.func);
 		BasicBlock fbb = new BasicBlock();
 		BasicBlock mergebb = new BasicBlock();
@@ -1170,11 +1195,45 @@ public class MiniVMCompiler extends GrammarVisitor {
 	}
 
 	public void visitByteMap(ByteMap e) {
-		CHARMAP inst = (CHARMAP) this.builder.createCHARMAP(e, this.jumpFailureJump());
-		for (int c = 0; c < 256; c++) {
-			if (e.byteMap[c]) {
-				inst.append(c);
+		if (this.option.useFusionInstruction) {
+			CHARMAP inst = (CHARMAP) this.builder.createCHARMAP(e, this.jumpFailureJump());
+			for (int c = 0; c < 256; c++) {
+				if (e.byteMap[c]) {
+					inst.append(c);
+				}
 			}
+		}
+		else {
+			BasicBlock fbb = null;
+			BasicBlock endbb = new BasicBlock();
+			BasicBlock mergebb = new BasicBlock();
+			this.builder.createPUSHpos(e);
+			int max = 0;
+			for (int i = 0; i < 256; i++) {
+				if (e.byteMap[i]) {
+					max = i;
+				}
+			}
+			for (int i = 0; i <= max; i++) {
+				if (e.byteMap[i]) {
+					fbb = new BasicBlock();
+					this.builder.createCHAR(e, fbb, i);
+					this.builder.createJUMP(e, endbb);
+					this.setInsertPoint(fbb);
+					if (i != max) {
+						this.builder.createSTOREflag(e, 0);
+						this.builder.createGETpos(e);
+					}
+					else {
+						this.builder.createSTOREpos(e);
+					}
+					this.builder.setCurrentBB(fbb);
+				}
+			}
+			this.builder.createJUMP(e, this.jumpFailureJump());
+			this.setInsertPoint(endbb);
+			this.builder.createPOPpos(e);
+			this.setInsertPoint(mergebb);
 		}
 	}
 
@@ -1203,14 +1262,14 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	public void visitAnd(And e) {
 		if (this.option.useFlowAnalysis) {
-			if (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.ChoiceRepetition)) {
+			if (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.ChoiceAnd)) {
 				BasicBlock fbb = new BasicBlock();
 				this.pushFailureJumpPoint(fbb);
 				this.builder.createPUSHpos(e);
 				e.get(0).visit(this);
 				this.popFailureJumpPoint(e);
 				this.setInsertPoint(fbb);
-				this.builder.createSTOREpos(e);
+				this.builder.createGETpos(e);
 				this.builder.createIFFAIL(e, this.jumpFailureJump());
 				this.builder.setCurrentBB(fbb);
 				return;
@@ -1297,6 +1356,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 	}
 
 	boolean backTrackFlag = false;
+	boolean lastChoiceElementIsUnary = false;
 
 	public void visitChoice(Choice e) {
 		if (this.option.useMappedChoice && optChoiceMode) {
@@ -1330,7 +1390,9 @@ public class MiniVMCompiler extends GrammarVisitor {
 							fbb = new BasicBlock();
 							this.pushFailureJumpPoint(fbb);
 							inner.visit(this);
-							this.builder.createJUMP(e, endbb);
+							if (i != e.size() - 1) {
+								this.builder.createJUMP(e, endbb);
+							}
 							this.popFailureJumpPoint(inner);
 							this.setInsertPoint(fbb);
 						}
@@ -1363,7 +1425,9 @@ public class MiniVMCompiler extends GrammarVisitor {
 							fbb = new BasicBlock();
 							this.pushFailureJumpPoint(fbb);
 							inner.visit(this);
-							this.builder.createJUMP(e, endbb);
+							if (i != e.size() - 1) {
+								this.builder.createJUMP(e, endbb);
+							}
 							this.popFailureJumpPoint(inner);
 							this.setInsertPoint(fbb);
 						}
@@ -1373,11 +1437,17 @@ public class MiniVMCompiler extends GrammarVisitor {
 				}
 			}
 			else if (this.option.useFusionInstruction) {
+//				if (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.CharClassChoice)) {
+				if (this.analyzer.checkCharset(e)) {
+					writeCharsetCode(e, 0, e.size());
+					return;
+				}
 				boolean backTrackFlag = this.backTrackFlag = false;
 				BasicBlock bb = null;
 				BasicBlock fbb = null;
 				BasicBlock endbb = new BasicBlock();
 				BasicBlock mergebb = new BasicBlock();
+				this.builder.createPUSHpos(e);
 				for (int i = 0; i < e.size(); i++) {
 					Expression inner = e.get(i);
 					if (this.analyzer.flowAnalysisMap.get(inner).equals(ExprFlow.Default)) {
@@ -1390,22 +1460,39 @@ public class MiniVMCompiler extends GrammarVisitor {
 							this.setInsertPoint(fbb);
 							if (i != e.size() - 1) {
 								this.builder.createSTOREflag(e, 0);
+								this.builder.createGETpos(e);
 							}
-							this.builder.createSTOREpos(e);
+							else {
+								this.builder.createSTOREpos(e);
+							}
 							this.builder.setCurrentBB(fbb);
 						}
 					}
 					else {
 						fbb = new BasicBlock();
-						this.pushFailureJumpPoint(fbb);
+						if (i == e.size() - 1) {
+							this.lastChoiceElementIsUnary = true;
+						}
+						else {
+							this.pushFailureJumpPoint(fbb);
+						}
 						inner.visit(this);
-						this.builder.createJUMP(e, mergebb);
+						if (i != e.size() - 1) {
+							this.builder.createJUMP(e, endbb);
+							this.popFailureJumpPoint(inner);
+							this.setInsertPoint(fbb);
+						}
 						this.popFailureJumpPoint(inner);
 						this.setInsertPoint(fbb);
 					}
 				}
 				if (backTrackFlag) {
-					this.builder.createJUMP(e, this.jumpFailureJump());
+					if (!this.lastChoiceElementIsUnary) {
+						this.builder.createJUMP(e, this.jumpFailureJump());
+					}
+					else {
+						this.lastChoiceElementIsUnary = false;
+					}
 					this.setInsertPoint(endbb);
 					this.builder.createPOPpos(e);
 					this.setInsertPoint(mergebb);
@@ -1416,32 +1503,47 @@ public class MiniVMCompiler extends GrammarVisitor {
 				BasicBlock fbb = null;
 				BasicBlock endbb = new BasicBlock();
 				BasicBlock mergebb = new BasicBlock();
+				this.builder.createPUSHpos(e);
 				for (int i = 0; i < e.size(); i++) {
 					Expression inner = e.get(i);
 					if (this.analyzer.flowAnalysisMap.get(inner).equals(ExprFlow.Default)) {
 						fbb = new BasicBlock();
 						this.pushFailureJumpPoint(fbb);
-						this.builder.createPUSHpos(e);
 						e.get(i).visit(this);
 						this.builder.createJUMP(e, endbb);
 						this.popFailureJumpPoint(e.get(i));
 						this.setInsertPoint(fbb);
 						if (i != e.size() - 1) {
 							this.builder.createSTOREflag(e, 0);
+							this.builder.createGETpos(e);
 						}
-						this.builder.createSTOREpos(e);
+						else {
+							this.builder.createSTOREpos(e);
+						}
 						this.builder.setCurrentBB(fbb);
 					}
 					else {
 						fbb = new BasicBlock();
-						this.pushFailureJumpPoint(fbb);
+						if (i == e.size() - 1) {
+							this.lastChoiceElementIsUnary = true;
+						}
+						else {
+							this.pushFailureJumpPoint(fbb);
+						}
 						inner.visit(this);
-						this.builder.createJUMP(e, mergebb);
-						this.popFailureJumpPoint(inner);
-						this.setInsertPoint(fbb);
+						if (i != e.size() - 1) {
+							this.builder.createJUMP(e, endbb);
+							this.popFailureJumpPoint(inner);
+							this.setInsertPoint(fbb);
+						}
 					}
 				}
-				this.builder.createJUMP(e, this.jumpFailureJump());
+				if (!this.lastChoiceElementIsUnary) {
+					this.builder.createJUMP(e, this.jumpFailureJump());
+				}
+				else {
+					this.lastChoiceElementIsUnary = false;
+				}
 				this.setInsertPoint(endbb);
 				this.builder.createPOPpos(e);
 				this.setInsertPoint(mergebb);
@@ -1449,11 +1551,17 @@ public class MiniVMCompiler extends GrammarVisitor {
 		}
 		else {
 			if (this.option.useFusionInstruction) {
+//				if (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.CharClassChoice)) {
+				if (this.analyzer.checkCharset(e)) {
+					writeCharsetCode(e, 0, e.size());
+					return;
+				}
 				boolean backTrackFlag = this.backTrackFlag = false;
 				BasicBlock bb = null;
 				BasicBlock fbb = null;
 				BasicBlock endbb = new BasicBlock();
 				BasicBlock mergebb = new BasicBlock();
+				this.builder.createPUSHpos(e);
 				for (int i = 0; i < e.size(); i++) {
 					Expression inner = e.get(i);
 					i = checkWriteChoiceCharset(e, i, bb, fbb, false);
@@ -1465,8 +1573,11 @@ public class MiniVMCompiler extends GrammarVisitor {
 						this.setInsertPoint(fbb);
 						if (i != e.size() - 1) {
 							this.builder.createSTOREflag(e, 0);
+							this.builder.createGETpos(e);
 						}
-						this.builder.createSTOREpos(e);
+						else {
+							this.builder.createSTOREpos(e);
+						}
 						this.builder.setCurrentBB(fbb);
 					}
 				}
@@ -1482,18 +1593,21 @@ public class MiniVMCompiler extends GrammarVisitor {
 				BasicBlock fbb = null;
 				BasicBlock endbb = new BasicBlock();
 				BasicBlock mergebb = new BasicBlock();
+				this.builder.createPUSHpos(e);
 				for (int i = 0; i < e.size(); i++) {
 					fbb = new BasicBlock();
 					this.pushFailureJumpPoint(fbb);
-					this.builder.createPUSHpos(e);
 					e.get(i).visit(this);
 					this.builder.createJUMP(e, endbb);
 					this.popFailureJumpPoint(e.get(i));
 					this.setInsertPoint(fbb);
 					if (i != e.size() - 1) {
 						this.builder.createSTOREflag(e, 0);
+						this.builder.createGETpos(e);
 					}
-					this.builder.createSTOREpos(e);
+					else {
+						this.builder.createSTOREpos(e);
+					}
 					this.builder.setCurrentBB(fbb);
 				}
 				this.builder.createJUMP(e, this.jumpFailureJump());
@@ -1590,11 +1704,15 @@ public class MiniVMCompiler extends GrammarVisitor {
 	}
 
 	public void visitTagging(Tagging e) {
-		this.builder.createTAG(e, "#" + e.tag.toString());
+		if (!this.PatternMatching) {
+			this.builder.createTAG(e, "#" + e.tag.toString());
+		}
 	}
 
 	public void visitReplace(Replace e) {
-		this.builder.createVALUE(e, e.value);
+		if (!this.PatternMatching) {
+			this.builder.createVALUE(e, e.value);
+		}
 	}
 
 	@Override

@@ -257,6 +257,7 @@ class STRING extends JumpMatchingInstruction {
 		for (int i = 0; i < this.size(); i++) {
 			sb.append(this.getc(i) + " ");
 		}
+		sb.append("jump:" + this.jump.getBBName());
 	}
 
 	@Override
@@ -279,7 +280,8 @@ class ANY extends JumpMatchingInstruction {
 
 	@Override
 	protected void stringfy(StringBuilder sb) {
-		sb.append("  ANY");
+		sb.append("  ANY ");
+		sb.append("jump:" + this.jump.getBBName());
 	}
 
 	@Override

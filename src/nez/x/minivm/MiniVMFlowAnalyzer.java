@@ -127,13 +127,7 @@ public class MiniVMFlowAnalyzer extends GrammarVisitor {
 	}
 
 	public void visitRepetition(Repetition e) {
-		Expression top = this.peek();
-		if (top instanceof Choice) {
-			this.flowAnalysisMap.put(e, ExprFlow.ChoiceRepetition);
-		}
-		else {
-			this.flowAnalysisMap.put(e, ExprFlow.Default);
-		}
+		this.flowAnalysisMap.put(e, ExprFlow.Default);
 		this.push(e);
 		e.get(0).visit(this);
 		this.pop();
@@ -153,8 +147,21 @@ public class MiniVMFlowAnalyzer extends GrammarVisitor {
 		this.pop();
 	}
 
+	public boolean checkCharset(Choice e) {
+		for (int i = 0; i < e.size(); i++) {
+			if (!(e.get(i) instanceof ByteChar || e.get(i) instanceof ByteMap)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public void visitChoice(Choice e) {
 		Expression top = this.peek();
+		if(checkCharset(e)) {
+			this.flowAnalysisMap.put(e, ExprFlow.CharClassChoice);
+			return;
+		}
 		if (top != null) {
 			if (top instanceof Unary && !(top instanceof Link || top instanceof Repetition1)) {
 				this.flowAnalysisMap.put(e, ExprFlow.UnaryChoice);
@@ -175,6 +182,7 @@ public class MiniVMFlowAnalyzer extends GrammarVisitor {
 		}
 		else {
 			this.push(e);
+			this.flowAnalysisMap.put(e, ExprFlow.Default);
 			for (int i = 0; i < e.size(); i++) {
 				Expression inner = e.get(i);
 				this.flowAnalysisMap.put(inner, ExprFlow.Default);
@@ -231,6 +239,7 @@ enum ExprFlow {
 	ChoiceNot,
 	ChoiceAnd,
 	ChoiceOption,
-	ChoiceRepetition,
+//	ChoiceRepetition,
+	CharClassChoice,
 	Default
 }
