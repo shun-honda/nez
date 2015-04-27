@@ -39,21 +39,17 @@ public class IRBuilder {
 		return curBB.append(new IFFAIL(e, jump));
 	}
 
-	public Instruction createIFSUCC(Expression e, BasicBlock jump) {
-		return curBB.append(new IFSUCC(e, jump));
-	}
-
 	public Instruction createCHAR(Expression e, BasicBlock jump, int byteChar) {
 		return curBB.append(new CHAR(e, jump, byteChar));
 	}
 
-	public Instruction createCHARMAP(Expression e, BasicBlock jump) {
-		return curBB.append(new CHARMAP(e, jump));
-	}
-
-	public Instruction createSTRING(Expression e, BasicBlock jump) {
-		return curBB.append(new STRING(e, jump));
-	}
+//	public Instruction createCHARMAP(Expression e, BasicBlock jump) {
+//		return curBB.append(new CHARMAP(e, jump));
+//	}
+//
+//	public Instruction createSTRING(Expression e, BasicBlock jump) {
+//		return curBB.append(new STRING(e, jump));
+//	}
 
 	public Instruction createANY(Expression e, BasicBlock jump) {
 		return curBB.append(new ANY(e, jump));
@@ -63,9 +59,9 @@ public class IRBuilder {
 		return curBB.append(new PUSHpos(e));
 	}
 
-	public Instruction createPUSHmark(Expression e) {
-		return curBB.append(new PUSHmark(e));
-	}
+//	public Instruction createPUSHmark(Expression e) {
+//		return curBB.append(new PUSHmark(e));
+//	}
 
 	public Instruction createPOPpos(Expression e) {
 		return curBB.append(new POPpos(e));
@@ -83,33 +79,33 @@ public class IRBuilder {
 		return curBB.append(new STOREflag(e, val));
 	}
 
-	public Instruction createNEW(Expression e) {
-		return curBB.append(new NEW(e));
-	}
-
-	public Instruction createLEFTJOIN(Expression e, int index) {
-		return curBB.append(new LEFTJOIN(e, index));
-	}
-
-	public Instruction createCAPTURE(Expression e) {
-		return curBB.append(new CAPTURE(e));
-	}
-
-	public Instruction createCOMMIT(Expression e, int index) {
-		return curBB.append(new COMMIT(e, index));
-	}
-
-	public Instruction createABORT(Expression e) {
-		return curBB.append(new ABORT(e));
-	}
-
-	public Instruction createTAG(Expression e, String tag) {
-		return curBB.append(new TAG(e, tag));
-	}
-
-	public Instruction createVALUE(Expression e, String value) {
-		return curBB.append(new VALUE(e, value));
-	}
+//	public Instruction createNEW(Expression e) {
+//		return curBB.append(new NEW(e));
+//	}
+//
+//	public Instruction createLEFTJOIN(Expression e, int index) {
+//		return curBB.append(new LEFTJOIN(e, index));
+//	}
+//
+//	public Instruction createCAPTURE(Expression e) {
+//		return curBB.append(new CAPTURE(e));
+//	}
+//
+//	public Instruction createCOMMIT(Expression e, int index) {
+//		return curBB.append(new COMMIT(e, index));
+//	}
+//
+//	public Instruction createABORT(Expression e) {
+//		return curBB.append(new ABORT(e));
+//	}
+//
+//	public Instruction createTAG(Expression e, String tag) {
+//		return curBB.append(new TAG(e, tag));
+//	}
+//
+//	public Instruction createVALUE(Expression e, String value) {
+//		return curBB.append(new VALUE(e, value));
+//	}
 
 //	public Instruction createMEMOIZE(Expression e, int memoPoint) {
 //		return curBB.append(new MEMOIZE(e, memoPoint));
@@ -127,43 +123,43 @@ public class IRBuilder {
 //		return curBB.append(new LOOKUPNODE(e, jump, memoPoint, index));
 //	}
 
-	public Instruction createNOTCHAR(Expression e, BasicBlock jump) {
-		return curBB.append(new NOTCHAR(e, jump));
-	}
-
-	public Instruction createNOTCHAR(Expression e, BasicBlock jump, int byteChar) {
-		return curBB.append(new NOTCHAR(e, jump, byteChar));
-	}
-
-	public Instruction createNOTCHARMAP(Expression e, BasicBlock jump) {
-		return curBB.append(new NOTCHARMAP(e, jump));
-	}
-
-	public Instruction createNOTSTRING(Expression e, BasicBlock jump) {
-		return curBB.append(new NOTSTRING(e, jump));
-	}
-
-	public Instruction createNOTCHARANY(Expression e, BasicBlock jump) {
-		return curBB.append(new NOTCHARANY(e, jump));
-	}
-
-	public Instruction createOPTIONALCHAR(Expression e) {
-		return curBB.append(new OPTIONALCHAR(e));
-	}
-
-	public Instruction createOPTIONALCHAR(Expression e, int byteChar) {
-		return curBB.append(new OPTIONALCHAR(e, byteChar));
-	}
-
-	public Instruction createOPTIONALCHARMAP(Expression e) {
-		return curBB.append(new OPTIONALCHARMAP(e));
-	}
-
-	public Instruction createOPTIONALSTRING(Expression e) {
-		return curBB.append(new OPTIONALSTRING(e));
-	}
-
-	public Instruction createZEROMORECHARMAP(Expression e) {
-		return curBB.append(new ZEROMORECHARMAP(e));
-	}
+//	public Instruction createNOTCHAR(Expression e, BasicBlock jump) {
+//		return curBB.append(new NOTCHAR(e, jump));
+//	}
+//
+//	public Instruction createNOTCHAR(Expression e, BasicBlock jump, int byteChar) {
+//		return curBB.append(new NOTCHAR(e, jump, byteChar));
+//	}
+//
+//	public Instruction createNOTCHARMAP(Expression e, BasicBlock jump) {
+//		return curBB.append(new NOTCHARMAP(e, jump));
+//	}
+//
+//	public Instruction createNOTSTRING(Expression e, BasicBlock jump) {
+//		return curBB.append(new NOTSTRING(e, jump));
+//	}
+//
+//	public Instruction createNOTCHARANY(Expression e, BasicBlock jump) {
+//		return curBB.append(new NOTCHARANY(e, jump));
+//	}
+//
+//	public Instruction createOPTIONALCHAR(Expression e) {
+//		return curBB.append(new OPTIONALCHAR(e));
+//	}
+//
+//	public Instruction createOPTIONALCHAR(Expression e, int byteChar) {
+//		return curBB.append(new OPTIONALCHAR(e, byteChar));
+//	}
+//
+//	public Instruction createOPTIONALCHARMAP(Expression e) {
+//		return curBB.append(new OPTIONALCHARMAP(e));
+//	}
+//
+//	public Instruction createOPTIONALSTRING(Expression e) {
+//		return curBB.append(new OPTIONALSTRING(e));
+//	}
+//
+//	public Instruction createZEROMORECHARMAP(Expression e) {
+//		return curBB.append(new ZEROMORECHARMAP(e));
+//	}
 }

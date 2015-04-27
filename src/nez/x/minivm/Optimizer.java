@@ -63,15 +63,15 @@ public class Optimizer {
 
 			for (int j = 0; j < bb.size(); j++) {
 				Instruction inst = bb.get(j);
-				if (inst instanceof NOTCHAR) {
-					if (bb.get(j + 1) instanceof ANY) {
-						NOTCHAR ir = (NOTCHAR) bb.remove(j);
-						bb.remove(j);
-						NOTCHARANY nca = new NOTCHARANY(ir.expr, ir.jump, ir.getc(0));
-						nca.addBasicBlock(j, bb);
-						inst = nca;
-					}
-				}
+//				if (inst instanceof NOTCHAR) {
+//					if (bb.get(j + 1) instanceof ANY) {
+//						NOTCHAR ir = (NOTCHAR) bb.remove(j);
+//						bb.remove(j);
+//						NOTCHARANY nca = new NOTCHARANY(ir.expr, ir.jump, ir.getc(0));
+//						nca.addBasicBlock(j, bb);
+//						inst = nca;
+//					}
+//				}
 				if (inst instanceof JumpInstruction) {
 					JumpInstruction jinst = (JumpInstruction) inst;
 					optimizeJump(func, bb, jinst.jump, jinst, j);

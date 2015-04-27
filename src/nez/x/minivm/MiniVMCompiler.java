@@ -53,19 +53,19 @@ public class MiniVMCompiler extends GrammarVisitor {
 		this.module = new Module();
 		this.option = new OptimizerOption();
 		switch (level) {
-		case 1:
-			this.option.setFlowAnalysis(true);
-			break;
-		case 2:
-			this.option.setFusionInstruction(true);
-			break;
-		case 3:
-			this.option.setInlining(true);
-			break;
-		case 4:
-			this.option.setFlowAnalysis(true);
-			this.option.setFusionInstruction(true);
-			this.option.setInlining(true);
+//		case 1:
+//			this.option.setFlowAnalysis(true);
+//			break;
+//		case 2:
+//			this.option.setFusionInstruction(true);
+//			break;
+//		case 3:
+//			this.option.setInlining(true);
+//			break;
+//		case 4:
+//			this.option.setFlowAnalysis(true);
+//			this.option.setFusionInstruction(true);
+//			this.option.setInlining(true);
 		default:
 			break;
 		}
@@ -216,96 +216,95 @@ public class MiniVMCompiler extends GrammarVisitor {
 			pos = write32(byteCode, ((CALL) code).jumpIndex - index, pos);
 			break;
 		case IFFAIL:
-		case IFSUCC:
 			pos = write32(byteCode, ((JumpInstruction) code).jump.codeIndex - index, pos);
 			break;
 		case CHAR:
 			pos = write32(byteCode, ((CHAR) code).getc(0), pos);
 			pos = write32(byteCode, ((CHAR) code).jump.codeIndex - index, pos);
 			break;
-		case CHARMAP:
-			CHARMAP charset = (CHARMAP) code;
-			pos = write16(byteCode, charset.size(), pos);
-			for (int j = 0; j < charset.size(); j++) {
-				pos = write32(byteCode, charset.getc(j), pos);
-			}
-			pos = write32(byteCode, charset.jump.codeIndex - index, pos);
-			break;
-		case STRING:
-			pos = write16(byteCode, ((STRING) code).size(), pos);
-			for (int j = 0; j < ((STRING) code).size(); j++) {
-				pos = write32(byteCode, ((STRING) code).getc(j), pos);
-			}
-			pos = write32(byteCode, ((STRING) code).jump.codeIndex - index, pos);
-			break;
+//		case CHARMAP:
+//			CHARMAP charset = (CHARMAP) code;
+//			pos = write16(byteCode, charset.size(), pos);
+//			for (int j = 0; j < charset.size(); j++) {
+//				pos = write32(byteCode, charset.getc(j), pos);
+//			}
+//			pos = write32(byteCode, charset.jump.codeIndex - index, pos);
+//			break;
+//		case STRING:
+//			pos = write16(byteCode, ((STRING) code).size(), pos);
+//			for (int j = 0; j < ((STRING) code).size(); j++) {
+//				pos = write32(byteCode, ((STRING) code).getc(j), pos);
+//			}
+//			pos = write32(byteCode, ((STRING) code).jump.codeIndex - index, pos);
+//			break;
 		case ANY:
 			pos = write32(byteCode, ((ANY) code).jump.codeIndex - index, pos);
 			break;
 		case STOREflag:
 			pos = write32(byteCode, ((STOREflag) code).val, pos);
 			break;
-		case LEFTJOIN:
-			pos = write32(byteCode, ((LEFTJOIN) code).index, pos);
-			break;
-		case COMMIT:
-			pos = write32(byteCode, ((COMMIT) code).index, pos);
-			break;
-		case TAG:
-			pos = writeCdataByteCode(byteCode, ((TAG) code).cdata, pos);
-			break;
-		case VALUE:
-			pos = writeCdataByteCode(byteCode, ((VALUE) code).cdata, pos);
-			break;
-		case NOTCHAR:
-			NOTCHAR nc = (NOTCHAR) code;
-			pos = write32(byteCode, nc.getc(0), pos);
-			pos = write32(byteCode, nc.jump.codeIndex - index, pos);
-			break;
-		case NOTCHARMAP:
-			NOTCHARMAP ncs = (NOTCHARMAP) code;
-			pos = write16(byteCode, ncs.size(), pos);
-			for (int j = 0; j < ncs.size(); j++) {
-				pos = write32(byteCode, ncs.getc(j), pos);
-			}
-			pos = write32(byteCode, ncs.jump.codeIndex - index, pos);
-			break;
-		case NOTSTRING:
-			NOTSTRING ns = (NOTSTRING) code;
-			pos = write16(byteCode, ns.size(), pos);
-			for (int j = 0; j < ns.size(); j++) {
-				pos = write32(byteCode, ns.getc(j), pos);
-			}
-			pos = write32(byteCode, ns.jump.codeIndex - index, pos);
-			break;
-		case NOTCHARANY:
-			NOTCHARANY nca = (NOTCHARANY) code;
-			pos = write32(byteCode, nca.getc(0), pos);
-			pos = write32(byteCode, nca.jump.codeIndex - index, pos);
-			break;
-		case OPTIONALCHAR:
-			pos = write32(byteCode, ((OPTIONALCHAR) code).getc(0), pos);
-			break;
-		case OPTIONALCHARMAP:
-			OPTIONALCHARMAP ocs = (OPTIONALCHARMAP) code;
-			pos = write16(byteCode, ocs.size(), pos);
-			for (int j = 0; j < ocs.size(); j++) {
-				pos = write32(byteCode, ocs.getc(j), pos);
-			}
-			break;
-		case OPTIONALSTRING:
-			OPTIONALSTRING os = (OPTIONALSTRING) code;
-			pos = write16(byteCode, os.size(), pos);
-			for (int j = 0; j < os.size(); j++) {
-				pos = write32(byteCode, os.getc(j), pos);
-			}
-			break;
-		case ZEROMORECHARMAP:
-			ZEROMORECHARMAP zcs = (ZEROMORECHARMAP) code;
-			pos = write16(byteCode, zcs.size(), pos);
-			for (int j = 0; j < zcs.size(); j++) {
-				pos = write32(byteCode, zcs.getc(j), pos);
-			}
-			break;
+//		case LEFTJOIN:
+//			pos = write32(byteCode, ((LEFTJOIN) code).index, pos);
+//			break;
+//		case COMMIT:
+//			pos = write32(byteCode, ((COMMIT) code).index, pos);
+//			break;
+//		case TAG:
+//			pos = writeCdataByteCode(byteCode, ((TAG) code).cdata, pos);
+//			break;
+//		case VALUE:
+//			pos = writeCdataByteCode(byteCode, ((VALUE) code).cdata, pos);
+//			break;
+//		case NOTCHAR:
+//			NOTCHAR nc = (NOTCHAR) code;
+//			pos = write32(byteCode, nc.getc(0), pos);
+//			pos = write32(byteCode, nc.jump.codeIndex - index, pos);
+//			break;
+//		case NOTCHARMAP:
+//			NOTCHARMAP ncs = (NOTCHARMAP) code;
+//			pos = write16(byteCode, ncs.size(), pos);
+//			for (int j = 0; j < ncs.size(); j++) {
+//				pos = write32(byteCode, ncs.getc(j), pos);
+//			}
+//			pos = write32(byteCode, ncs.jump.codeIndex - index, pos);
+//			break;
+//		case NOTSTRING:
+//			NOTSTRING ns = (NOTSTRING) code;
+//			pos = write16(byteCode, ns.size(), pos);
+//			for (int j = 0; j < ns.size(); j++) {
+//				pos = write32(byteCode, ns.getc(j), pos);
+//			}
+//			pos = write32(byteCode, ns.jump.codeIndex - index, pos);
+//			break;
+//		case NOTCHARANY:
+//			NOTCHARANY nca = (NOTCHARANY) code;
+//			pos = write32(byteCode, nca.getc(0), pos);
+//			pos = write32(byteCode, nca.jump.codeIndex - index, pos);
+//			break;
+//		case OPTIONALCHAR:
+//			pos = write32(byteCode, ((OPTIONALCHAR) code).getc(0), pos);
+//			break;
+//		case OPTIONALCHARMAP:
+//			OPTIONALCHARMAP ocs = (OPTIONALCHARMAP) code;
+//			pos = write16(byteCode, ocs.size(), pos);
+//			for (int j = 0; j < ocs.size(); j++) {
+//				pos = write32(byteCode, ocs.getc(j), pos);
+//			}
+//			break;
+//		case OPTIONALSTRING:
+//			OPTIONALSTRING os = (OPTIONALSTRING) code;
+//			pos = write16(byteCode, os.size(), pos);
+//			for (int j = 0; j < os.size(); j++) {
+//				pos = write32(byteCode, os.getc(j), pos);
+//			}
+//			break;
+//		case ZEROMORECHARMAP:
+//			ZEROMORECHARMAP zcs = (ZEROMORECHARMAP) code;
+//			pos = write16(byteCode, zcs.size(), pos);
+//			for (int j = 0; j < zcs.size(); j++) {
+//				pos = write32(byteCode, zcs.getc(j), pos);
+//			}
+//			break;
 		default:
 			break;
 		}
@@ -473,54 +472,54 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	BasicBlock currentFailBB;
 
-	private int checkWriteChoiceCharset(Choice e, int index, BasicBlock bb, BasicBlock fbb, boolean UnaryChoice) {
-		int charCount = 0;
-		for (int i = index; i < e.size(); i++) {
-			if (e.get(i) instanceof ByteChar || e.get(i) instanceof ByteMap) {
-				charCount++;
-			}
-			else {
-				break;
-			}
-		}
-		if (charCount <= 1) {
-			fbb = new BasicBlock();
-			this.pushFailureJumpPoint(fbb);
-			e.get(index).visit(this);
-			this.backTrackFlag = true;
-			this.currentFailBB = fbb;
-			return index++;
-		}
-		if (charCount != e.size()) {
-			backTrackFlag = true;
-			fbb = new BasicBlock();
-			this.currentFailBB = fbb;
-			this.pushFailureJumpPoint(fbb);
-		}
-		writeCharsetCode(e, index, charCount);
-		return index + charCount - 1;
-	}
-
-	private final int writeSequenceCode(Expression e, int index, int size) {
-		int count = 0;
-		for (int i = index; i < size; i++) {
-			if (e.get(i) instanceof ByteChar) {
-				count++;
-			}
-			else {
-				break;
-			}
-		}
-		if (count <= 1) {
-			e.get(index).visit(this);
-			return index++;
-		}
-		STRING str = (STRING) this.builder.createSTRING(e, this.jumpFailureJump());
-		for (int i = index; i < index + count; i++) {
-			str.append(((ByteChar) e.get(i)).byteChar);
-		}
-		return index + count - 1;
-	}
+//	private int checkWriteChoiceCharset(Choice e, int index, BasicBlock bb, BasicBlock fbb, boolean UnaryChoice) {
+//		int charCount = 0;
+//		for (int i = index; i < e.size(); i++) {
+//			if (e.get(i) instanceof ByteChar || e.get(i) instanceof ByteMap) {
+//				charCount++;
+//			}
+//			else {
+//				break;
+//			}
+//		}
+//		if (charCount <= 1) {
+//			fbb = new BasicBlock();
+//			this.pushFailureJumpPoint(fbb);
+//			e.get(index).visit(this);
+//			this.backTrackFlag = true;
+//			this.currentFailBB = fbb;
+//			return index++;
+//		}
+//		if (charCount != e.size()) {
+//			backTrackFlag = true;
+//			fbb = new BasicBlock();
+//			this.currentFailBB = fbb;
+//			this.pushFailureJumpPoint(fbb);
+//		}
+//		writeCharsetCode(e, index, charCount);
+//		return index + charCount - 1;
+//	}
+//
+//	private final int writeSequenceCode(Expression e, int index, int size) {
+//		int count = 0;
+//		for (int i = index; i < size; i++) {
+//			if (e.get(i) instanceof ByteChar) {
+//				count++;
+//			}
+//			else {
+//				break;
+//			}
+//		}
+//		if (count <= 1) {
+//			e.get(index).visit(this);
+//			return index++;
+//		}
+//		STRING str = (STRING) this.builder.createSTRING(e, this.jumpFailureJump());
+//		for (int i = index; i < index + count; i++) {
+//			str.append(((ByteChar) e.get(i)).byteChar);
+//		}
+//		return index + count - 1;
+//	}
 
 	// The depth to control the stack caching optimization
 	int depth = 0;
@@ -630,31 +629,31 @@ public class MiniVMCompiler extends GrammarVisitor {
 		return false;
 	}
 
-	private void writeCharsetCode(Expression e, int index, int charCount) {
-		CHARMAP inst = (CHARMAP) this.builder.createCHARMAP(e, this.jumpFailureJump());
-		for (int i = index; i < index + charCount; i++) {
-			if (e.get(i) instanceof ByteChar) {
-				inst.append(((ByteChar) e.get(i)).byteChar);
-			}
-			else if (e.get(i) instanceof ByteMap) {
-				ByteMap br = (ByteMap) e.get(i);
-				for (int c = 0; c < 256; c++) {
-					if (br.byteMap[c]) {
-						inst.append(c);
-					}
-				}
-			}
-			else {
-				System.out.println("Error: Not Char Content in Charset");
-			}
-		}
-	}
+//	private void writeCharsetCode(Expression e, int index, int charCount) {
+//		CHARMAP inst = (CHARMAP) this.builder.createCHARMAP(e, this.jumpFailureJump());
+//		for (int i = index; i < index + charCount; i++) {
+//			if (e.get(i) instanceof ByteChar) {
+//				inst.append(((ByteChar) e.get(i)).byteChar);
+//			}
+//			else if (e.get(i) instanceof ByteMap) {
+//				ByteMap br = (ByteMap) e.get(i);
+//				for (int c = 0; c < 256; c++) {
+//					if (br.byteMap[c]) {
+//						inst.append(c);
+//					}
+//				}
+//			}
+//			else {
+//				System.out.println("Error: Not Char Content in Charset");
+//			}
+//		}
+//	}
 
-	private void optimizeChoice(Choice e) {
-		if (this.checkCharMap(e)) {
-			writeCharsetCode(e, 0, e.size());
-		}
-	}
+//	private void optimizeChoice(Choice e) {
+//		if (this.checkCharMap(e)) {
+//			writeCharsetCode(e, 0, e.size());
+//		}
+//	}
 
 	private Expression getNonTerminalRule(Expression e) {
 		while (e instanceof NonTerminal) {
@@ -757,66 +756,66 @@ public class MiniVMCompiler extends GrammarVisitor {
 //		}
 //	}
 
-	private void writeNotCharMapCode(Choice e) {
-		NOTCHARMAP inst = (NOTCHARMAP) this.builder.createNOTCHARMAP(e, this.jumpFailureJump());
-		for (int i = 0; i < e.size(); i++) {
-			if (e.get(i) instanceof ByteChar) {
-				inst.append(((ByteChar) e.get(i)).byteChar);
-			}
-			else if (e.get(i) instanceof ByteMap) {
-				ByteMap br = (ByteMap) e.get(i);
-				for (int c = 0; c < 256; c++) {
-					if (br.byteMap[c]) {
-						inst.append(c);
-					}
-				}
-			}
-			else {
-				System.out.println("Error: Not Char Content in Charset");
-			}
-		}
-	}
-
-	private void writeNotStringCode(Sequence e) {
-		NOTSTRING inst = (NOTSTRING) this.builder.createNOTSTRING(e, this.jumpFailureJump());
-		for (int i = 0; i < e.size(); i++) {
-			inst.append(((ByteChar) e.get(i)).byteChar);
-		}
-	}
-
-	private boolean optimizeNot(Not e) {
-		Expression inner = e.get(0);
-		if (inner instanceof NonTerminal) {
-			inner = getNonTerminalRule(inner);
-		}
-		if (inner instanceof ByteChar) {
-			this.builder.createNOTCHAR(inner, this.jumpFailureJump(), ((ByteChar) inner).byteChar);
-			return true;
-		}
-		if (inner instanceof ByteMap) {
-			ByteMap br = (ByteMap) inner;
-			NOTCHARMAP inst = (NOTCHARMAP) this.builder.createNOTCHARMAP(inner, this.jumpFailureJump());
-			for (int c = 0; c < 256; c++) {
-				if (br.byteMap[c]) {
-					inst.append(c);
-				}
-			}
-			return true;
-		}
-		if (inner instanceof Choice) {
-			if (checkCharMap((Choice) inner)) {
-				writeNotCharMapCode((Choice) inner);
-				return true;
-			}
-		}
-		if (inner instanceof Sequence) {
-			if (checkString((Sequence) inner)) {
-				writeNotStringCode((Sequence) inner);
-				return true;
-			}
-		}
-		return false;
-	}
+//	private void writeNotCharMapCode(Choice e) {
+//		NOTCHARMAP inst = (NOTCHARMAP) this.builder.createNOTCHARMAP(e, this.jumpFailureJump());
+//		for (int i = 0; i < e.size(); i++) {
+//			if (e.get(i) instanceof ByteChar) {
+//				inst.append(((ByteChar) e.get(i)).byteChar);
+//			}
+//			else if (e.get(i) instanceof ByteMap) {
+//				ByteMap br = (ByteMap) e.get(i);
+//				for (int c = 0; c < 256; c++) {
+//					if (br.byteMap[c]) {
+//						inst.append(c);
+//					}
+//				}
+//			}
+//			else {
+//				System.out.println("Error: Not Char Content in Charset");
+//			}
+//		}
+//	}
+//
+//	private void writeNotStringCode(Sequence e) {
+//		NOTSTRING inst = (NOTSTRING) this.builder.createNOTSTRING(e, this.jumpFailureJump());
+//		for (int i = 0; i < e.size(); i++) {
+//			inst.append(((ByteChar) e.get(i)).byteChar);
+//		}
+//	}
+//
+//	private boolean optimizeNot(Not e) {
+//		Expression inner = e.get(0);
+//		if (inner instanceof NonTerminal) {
+//			inner = getNonTerminalRule(inner);
+//		}
+//		if (inner instanceof ByteChar) {
+//			this.builder.createNOTCHAR(inner, this.jumpFailureJump(), ((ByteChar) inner).byteChar);
+//			return true;
+//		}
+//		if (inner instanceof ByteMap) {
+//			ByteMap br = (ByteMap) inner;
+//			NOTCHARMAP inst = (NOTCHARMAP) this.builder.createNOTCHARMAP(inner, this.jumpFailureJump());
+//			for (int c = 0; c < 256; c++) {
+//				if (br.byteMap[c]) {
+//					inst.append(c);
+//				}
+//			}
+//			return true;
+//		}
+//		if (inner instanceof Choice) {
+//			if (checkCharMap((Choice) inner)) {
+//				writeNotCharMapCode((Choice) inner);
+//				return true;
+//			}
+//		}
+//		if (inner instanceof Sequence) {
+//			if (checkString((Sequence) inner)) {
+//				writeNotStringCode((Sequence) inner);
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
 
 	private void writeOptionalCode(Option e) {
 		if (this.option.useFlowAnalysis) {
@@ -904,67 +903,67 @@ public class MiniVMCompiler extends GrammarVisitor {
 //		}
 //	}
 
-	private void writeOptionalByteMapCode(ByteMap e) {
-		OPTIONALCHARMAP inst = (OPTIONALCHARMAP) this.builder.createOPTIONALCHARMAP(e);
-		for (int c = 0; c < 256; c++) {
-			if (e.byteMap[c]) {
-				inst.append(c);
-			}
-		}
-	}
-
-	private void writeOptionalCharMapCode(Choice e) {
-		OPTIONALCHARMAP inst = (OPTIONALCHARMAP) this.builder.createOPTIONALCHARMAP(e);
-		for (int i = 0; i < e.size(); i++) {
-			if (e.get(i) instanceof ByteChar) {
-				inst.append(((ByteChar) e.get(i)).byteChar);
-			}
-			else if (e.get(i) instanceof ByteMap) {
-				ByteMap br = (ByteMap) e.get(i);
-				for (int c = 0; c < 256; c++) {
-					if (br.byteMap[c]) {
-						inst.append(c);
-					}
-				}
-			}
-			else {
-				System.out.println("Error: Not Char Content in Charset");
-			}
-		}
-	}
-
-	private void writeOptionalStringCode(Sequence e) {
-		OPTIONALSTRING inst = (OPTIONALSTRING) this.builder.createOPTIONALSTRING(e);
-		for (int i = 0; i < e.size(); i++) {
-			inst.append(((ByteChar) e.get(i)).byteChar);
-		}
-	}
+//	private void writeOptionalByteMapCode(ByteMap e) {
+//		OPTIONALCHARMAP inst = (OPTIONALCHARMAP) this.builder.createOPTIONALCHARMAP(e);
+//		for (int c = 0; c < 256; c++) {
+//			if (e.byteMap[c]) {
+//				inst.append(c);
+//			}
+//		}
+//	}
+//
+//	private void writeOptionalCharMapCode(Choice e) {
+//		OPTIONALCHARMAP inst = (OPTIONALCHARMAP) this.builder.createOPTIONALCHARMAP(e);
+//		for (int i = 0; i < e.size(); i++) {
+//			if (e.get(i) instanceof ByteChar) {
+//				inst.append(((ByteChar) e.get(i)).byteChar);
+//			}
+//			else if (e.get(i) instanceof ByteMap) {
+//				ByteMap br = (ByteMap) e.get(i);
+//				for (int c = 0; c < 256; c++) {
+//					if (br.byteMap[c]) {
+//						inst.append(c);
+//					}
+//				}
+//			}
+//			else {
+//				System.out.println("Error: Not Char Content in Charset");
+//			}
+//		}
+//	}
+//
+//	private void writeOptionalStringCode(Sequence e) {
+//		OPTIONALSTRING inst = (OPTIONALSTRING) this.builder.createOPTIONALSTRING(e);
+//		for (int i = 0; i < e.size(); i++) {
+//			inst.append(((ByteChar) e.get(i)).byteChar);
+//		}
+//	}
 
 	private boolean optimizeOptional(Option e) {
-		Expression inner = e.get(0);
-		if (inner instanceof NonTerminal) {
-			inner = getNonTerminalRule(inner);
-		}
-		if (inner instanceof ByteChar) {
-			this.builder.createOPTIONALCHAR(inner, ((ByteChar) inner).byteChar);
-			return true;
-		}
-		if (inner instanceof ByteMap) {
-			writeOptionalByteMapCode((ByteMap) inner);
-			return true;
-		}
-		if (inner instanceof Choice) {
-			if (checkCharMap((Choice) inner)) {
-				writeOptionalCharMapCode((Choice) inner);
-				return true;
-			}
-		}
-		if (inner instanceof Sequence) {
-			if (checkString((Sequence) inner)) {
-				writeOptionalStringCode((Sequence) inner);
-				return true;
-			}
-		}
+//		Expression inner = e.get(0);
+//		if (inner instanceof NonTerminal) {
+//			inner = getNonTerminalRule(inner);
+//		}
+//		if (inner instanceof ByteChar) {
+//			this.builder.createOPTIONALCHAR(inner, ((ByteChar) inner).byteChar);
+//			return true;
+//		}
+//		if (inner instanceof ByteMap) {
+//			writeOptionalByteMapCode((ByteMap) inner);
+//			return true;
+//		}
+//		if (inner instanceof Choice) {
+//			if (checkCharMap((Choice) inner)) {
+//				writeOptionalCharMapCode((Choice) inner);
+//				return true;
+//			}
+//		}
+//		if (inner instanceof Sequence) {
+//			if (checkString((Sequence) inner)) {
+//				writeOptionalStringCode((Sequence) inner);
+//				return true;
+//			}
+//		}
 		return false;
 	}
 
@@ -1060,52 +1059,52 @@ public class MiniVMCompiler extends GrammarVisitor {
 //		}
 //	}
 
-	private void writeZeroMoreByteMapCode(ByteMap e, ZEROMORECHARMAP inst) {
-		for (int c = 0; c < 256; c++) {
-			if (e.byteMap[c]) {
-				inst.append(c);
-			}
-		}
-	}
-
-	private void writeZeroMoreByteMapCode(ByteMap e) {
-		ZEROMORECHARMAP inst = (ZEROMORECHARMAP) this.builder.createZEROMORECHARMAP(e);
-		writeZeroMoreByteMapCode(e, inst);
-	}
-
-	private void writeZeroMoreCharsetCode(Choice e) {
-		ZEROMORECHARMAP inst = (ZEROMORECHARMAP) this.builder.createZEROMORECHARMAP(e);
-		for (int i = 0; i < e.size(); i++) {
-			if (e.get(i) instanceof ByteChar) {
-				inst.append(((ByteChar) e.get(i)).byteChar);
-			}
-			else if (e.get(i) instanceof ByteMap) {
-				ByteMap br = (ByteMap) e.get(i);
-				writeZeroMoreByteMapCode(br, inst);
-			}
-			else {
-				System.out.println("Error: Not Char Content in Charset");
-			}
-		}
-	}
-
-	private boolean optimizeRepetition(Repetition e) {
-		Expression inner = e.get(0);
-		if (inner instanceof NonTerminal) {
-			inner = getNonTerminalRule(inner);
-		}
-		if (inner instanceof ByteMap) {
-			writeZeroMoreByteMapCode((ByteMap) inner);
-			return true;
-		}
-		if (inner instanceof Choice) {
-			if (checkCharMap((Choice) inner)) {
-				writeZeroMoreCharsetCode((Choice) inner);
-				return true;
-			}
-		}
-		return false;
-	}
+//	private void writeZeroMoreByteMapCode(ByteMap e, ZEROMORECHARMAP inst) {
+//		for (int c = 0; c < 256; c++) {
+//			if (e.byteMap[c]) {
+//				inst.append(c);
+//			}
+//		}
+//	}
+//
+//	private void writeZeroMoreByteMapCode(ByteMap e) {
+//		ZEROMORECHARMAP inst = (ZEROMORECHARMAP) this.builder.createZEROMORECHARMAP(e);
+//		writeZeroMoreByteMapCode(e, inst);
+//	}
+//
+//	private void writeZeroMoreCharsetCode(Choice e) {
+//		ZEROMORECHARMAP inst = (ZEROMORECHARMAP) this.builder.createZEROMORECHARMAP(e);
+//		for (int i = 0; i < e.size(); i++) {
+//			if (e.get(i) instanceof ByteChar) {
+//				inst.append(((ByteChar) e.get(i)).byteChar);
+//			}
+//			else if (e.get(i) instanceof ByteMap) {
+//				ByteMap br = (ByteMap) e.get(i);
+//				writeZeroMoreByteMapCode(br, inst);
+//			}
+//			else {
+//				System.out.println("Error: Not Char Content in Charset");
+//			}
+//		}
+//	}
+//
+//	private boolean optimizeRepetition(Repetition e) {
+//		Expression inner = e.get(0);
+//		if (inner instanceof NonTerminal) {
+//			inner = getNonTerminalRule(inner);
+//		}
+//		if (inner instanceof ByteMap) {
+//			writeZeroMoreByteMapCode((ByteMap) inner);
+//			return true;
+//		}
+//		if (inner instanceof Choice) {
+//			if (checkCharMap((Choice) inner)) {
+//				writeZeroMoreCharsetCode((Choice) inner);
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
 
 //	MemoPoint issueMemoPoint(String label, Expression e) {
 //		if (this.PackratParsing) {
@@ -1196,12 +1195,12 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	public void visitByteMap(ByteMap e) {
 		if (this.option.useFusionInstruction) {
-			CHARMAP inst = (CHARMAP) this.builder.createCHARMAP(e, this.jumpFailureJump());
-			for (int c = 0; c < 256; c++) {
-				if (e.byteMap[c]) {
-					inst.append(c);
-				}
-			}
+//			CHARMAP inst = (CHARMAP) this.builder.createCHARMAP(e, this.jumpFailureJump());
+//			for (int c = 0; c < 256; c++) {
+//				if (e.byteMap[c]) {
+//					inst.append(c);
+//				}
+//			}
 		}
 		else {
 			BasicBlock fbb = null;
@@ -1243,13 +1242,13 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	public void visitNot(Not e) {
 		if (this.option.useFusionInstruction) {
-			if (!optimizeNot(e)) {
+//			if (!optimizeNot(e)) {
 //				if (this.option.useStackCaching && checkSC(e.get(0))) {
 //					writeSCNotCode(e);
 //					return;
 //				}
-				writeNotCode(e);
-			}
+//				writeNotCode(e);
+//			}
 		}
 //		else if (this.option.useStackCaching && checkSC(e.get(0))) {
 //			writeSCNotCode(e);
@@ -1307,13 +1306,13 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	public void visitRepetition(Repetition e) {
 		if (this.option.useFusionInstruction) {
-			if (!optimizeRepetition(e)) {
+//			if (!optimizeRepetition(e)) {
 //				if (this.option.useStackCaching && checkSC(e.get(0))) {
 //					writeSCRepetitionCode(e);
 //					return;
 //				}
-				writeRepetitionCode(e);
-			}
+//				writeRepetitionCode(e);
+//			}
 		}
 //		else if (this.option.useStackCaching && checkSC(e.get(0))) {
 //			writeSCRepetitionCode(e);
@@ -1327,13 +1326,13 @@ public class MiniVMCompiler extends GrammarVisitor {
 	public void visitRepetition1(Repetition1 e) {
 		e.get(0).visit(this);
 		if (this.option.useFusionInstruction) {
-			if (!optimizeRepetition(e)) {
+//			if (!optimizeRepetition(e)) {
 //				if (this.option.useStackCaching && checkSC(e.get(0))) {
 //					writeSCRepetitionCode(e);
 //					return;
 //				}
-				writeRepetitionCode(e);
-			}
+//				writeRepetitionCode(e);
+//			}
 		}
 //		else if (this.option.useStackCaching && checkSC(e.get(0))) {
 //			writeSCRepetitionCode(e);
@@ -1347,7 +1346,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 	public void visitSequence(Sequence e) {
 		for (int i = 0; i < e.size(); i++) {
 			if (this.option.useFusionInstruction) {
-				i = writeSequenceCode(e, i, e.size());
+//				i = writeSequenceCode(e, i, e.size());
 			}
 			else {
 				e.get(i).visit(this);
@@ -1360,7 +1359,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	public void visitChoice(Choice e) {
 		if (this.option.useMappedChoice && optChoiceMode) {
-			this.optimizeChoice(e);
+//			this.optimizeChoice(e);
 		}
 		if (this.option.useFlowAnalysis) {
 			if (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.UnaryChoice)) {
@@ -1372,7 +1371,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 					for (int i = 0; i < e.size(); i++) {
 						Expression inner = e.get(i);
 						if (this.analyzer.flowAnalysisMap.get(inner).equals(ExprFlow.Default)) {
-							i = checkWriteChoiceCharset(e, i, bb, fbb, true);
+//							i = checkWriteChoiceCharset(e, i, bb, fbb, true);
 							backTrackFlag = this.backTrackFlag;
 							if (backTrackFlag) {
 								fbb = this.currentFailBB;
@@ -1439,7 +1438,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 			else if (this.option.useFusionInstruction) {
 //				if (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.CharClassChoice)) {
 				if (this.analyzer.checkCharset(e)) {
-					writeCharsetCode(e, 0, e.size());
+//					writeCharsetCode(e, 0, e.size());
 					return;
 				}
 				boolean backTrackFlag = this.backTrackFlag = false;
@@ -1451,7 +1450,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 				for (int i = 0; i < e.size(); i++) {
 					Expression inner = e.get(i);
 					if (this.analyzer.flowAnalysisMap.get(inner).equals(ExprFlow.Default)) {
-						i = checkWriteChoiceCharset(e, i, bb, fbb, false);
+//						i = checkWriteChoiceCharset(e, i, bb, fbb, false);
 						backTrackFlag = this.backTrackFlag;
 						if (backTrackFlag) {
 							fbb = this.currentFailBB;
@@ -1553,7 +1552,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 			if (this.option.useFusionInstruction) {
 //				if (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.CharClassChoice)) {
 				if (this.analyzer.checkCharset(e)) {
-					writeCharsetCode(e, 0, e.size());
+//					writeCharsetCode(e, 0, e.size());
 					return;
 				}
 				boolean backTrackFlag = this.backTrackFlag = false;
@@ -1564,7 +1563,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 				this.builder.createPUSHpos(e);
 				for (int i = 0; i < e.size(); i++) {
 					Expression inner = e.get(i);
-					i = checkWriteChoiceCharset(e, i, bb, fbb, false);
+//					i = checkWriteChoiceCharset(e, i, bb, fbb, false);
 					backTrackFlag = this.backTrackFlag;
 					if (backTrackFlag) {
 						fbb = this.currentFailBB;
@@ -1619,100 +1618,100 @@ public class MiniVMCompiler extends GrammarVisitor {
 	}
 
 	public void visitNew(New e) {
-		if (PatternMatching) {
-			for (int i = 0; i < e.size(); i++) {
-				if (this.option.useFusionInstruction) {
-					i = writeSequenceCode(e, i, e.size());
-				}
-				else {
-					e.get(i).visit(this);
-				}
-			}
-		}
-		else {
-			BasicBlock fbb = new BasicBlock();
-			this.pushFailureJumpPoint(fbb);
-			if (e.lefted) {
-				this.builder.createLEFTJOIN(e, 0);
-			}
-			else {
-				this.builder.createNEW(e);
-			}
-		}
+//		if (PatternMatching) {
+//			for (int i = 0; i < e.size(); i++) {
+//				if (this.option.useFusionInstruction) {
+////					i = writeSequenceCode(e, i, e.size());
+//				}
+//				else {
+//					e.get(i).visit(this);
+//				}
+//			}
+//		}
+//		else {
+//			BasicBlock fbb = new BasicBlock();
+//			this.pushFailureJumpPoint(fbb);
+//			if (e.lefted) {
+//				this.builder.createLEFTJOIN(e, 0);
+//			}
+//			else {
+//				this.builder.createNEW(e);
+//			}
+//		}
 	}
 
 	public void visitCapture(Capture e) {
-		if (!PatternMatching) {
-			BasicBlock mergebb = new BasicBlock();
-			this.builder.createCAPTURE(e);
-			this.builder.createPOPpos(e);
-			this.builder.createJUMP(e, mergebb);
-			BasicBlock fbb = this.popFailureJumpPoint(e);
-			this.setInsertPoint(fbb);
-			this.builder.createABORT(e);
-			this.builder.createJUMP(e, this.jumpFailureJump());
-			this.setInsertPoint(mergebb);
-			this.builder.setCurrentBB(mergebb);
-		}
-	}
-
-	public void visitLink(Link e) {
-		if (PatternMatching) {
-			e.get(0).visit(this);
-		}
-//		else if (this.PackratParsing) {
-//			BasicBlock fbb = new BasicBlock();
+//		if (!PatternMatching) {
 //			BasicBlock mergebb = new BasicBlock();
-//			this.pushFailureJumpPoint(fbb);
-//			Expression ref = Factory.resolveNonTerminal(e.get(0));
-//			MemoPoint m = this.issueMemoPoint(e.toString(), ref);
-//			if (m != null) {
-//				this.builder.createLOOKUPNODE(e, mergebb, m.id, e.index);
-//			}
-//			this.builder.createPUSHmark(e);
-//			e.get(0).visit(this);
-//			this.builder.createCOMMIT(e, e.index);
-//			if (m != null) {
-//				this.builder.createMEMOIZENODE(e, m.id);
-//			}
+//			this.builder.createCAPTURE(e);
+//			this.builder.createPOPpos(e);
 //			this.builder.createJUMP(e, mergebb);
-//			this.popFailureJumpPoint(e);
+//			BasicBlock fbb = this.popFailureJumpPoint(e);
 //			this.setInsertPoint(fbb);
 //			this.builder.createABORT(e);
-//			if (m != null) {
-//				this.builder.createMEMOIZENODE(e, m.id);
-//			}
 //			this.builder.createJUMP(e, this.jumpFailureJump());
 //			this.setInsertPoint(mergebb);
 //			this.builder.setCurrentBB(mergebb);
 //		}
-		else {
-			BasicBlock fbb = new BasicBlock();
-			BasicBlock mergebb = new BasicBlock();
-			this.pushFailureJumpPoint(fbb);
-			this.builder.createPUSHmark(e);
-			e.get(0).visit(this);
-			this.builder.createCOMMIT(e, e.index);
-			this.builder.createJUMP(e, mergebb);
-			this.popFailureJumpPoint(e);
-			this.setInsertPoint(fbb);
-			this.builder.createABORT(e);
-			this.builder.createJUMP(e, this.jumpFailureJump());
-			this.setInsertPoint(mergebb);
-			this.builder.setCurrentBB(mergebb);
-		}
+	}
+
+	public void visitLink(Link e) {
+//		if (PatternMatching) {
+//			e.get(0).visit(this);
+//		}
+////		else if (this.PackratParsing) {
+////			BasicBlock fbb = new BasicBlock();
+////			BasicBlock mergebb = new BasicBlock();
+////			this.pushFailureJumpPoint(fbb);
+////			Expression ref = Factory.resolveNonTerminal(e.get(0));
+////			MemoPoint m = this.issueMemoPoint(e.toString(), ref);
+////			if (m != null) {
+////				this.builder.createLOOKUPNODE(e, mergebb, m.id, e.index);
+////			}
+////			this.builder.createPUSHmark(e);
+////			e.get(0).visit(this);
+////			this.builder.createCOMMIT(e, e.index);
+////			if (m != null) {
+////				this.builder.createMEMOIZENODE(e, m.id);
+////			}
+////			this.builder.createJUMP(e, mergebb);
+////			this.popFailureJumpPoint(e);
+////			this.setInsertPoint(fbb);
+////			this.builder.createABORT(e);
+////			if (m != null) {
+////				this.builder.createMEMOIZENODE(e, m.id);
+////			}
+////			this.builder.createJUMP(e, this.jumpFailureJump());
+////			this.setInsertPoint(mergebb);
+////			this.builder.setCurrentBB(mergebb);
+////		}
+//		else {
+//			BasicBlock fbb = new BasicBlock();
+//			BasicBlock mergebb = new BasicBlock();
+//			this.pushFailureJumpPoint(fbb);
+//			this.builder.createPUSHmark(e);
+//			e.get(0).visit(this);
+//			this.builder.createCOMMIT(e, e.index);
+//			this.builder.createJUMP(e, mergebb);
+//			this.popFailureJumpPoint(e);
+//			this.setInsertPoint(fbb);
+//			this.builder.createABORT(e);
+//			this.builder.createJUMP(e, this.jumpFailureJump());
+//			this.setInsertPoint(mergebb);
+//			this.builder.setCurrentBB(mergebb);
+//		}
 	}
 
 	public void visitTagging(Tagging e) {
-		if (!this.PatternMatching) {
-			this.builder.createTAG(e, "#" + e.tag.toString());
-		}
+//		if (!this.PatternMatching) {
+//			this.builder.createTAG(e, "#" + e.tag.toString());
+//		}
 	}
 
 	public void visitReplace(Replace e) {
-		if (!this.PatternMatching) {
-			this.builder.createVALUE(e, e.value);
-		}
+//		if (!this.PatternMatching) {
+//			this.builder.createVALUE(e, e.value);
+//		}
 	}
 
 	@Override
