@@ -1656,9 +1656,9 @@ public class MiniVMCompiler extends GrammarVisitor {
 	}
 
 	public void visitLink(Link e) {
-//		if (PatternMatching) {
-//			e.get(0).visit(this);
-//		}
+		if (PatternMatching) {
+			e.get(0).visit(this);
+		}
 ////		else if (this.PackratParsing) {
 ////			BasicBlock fbb = new BasicBlock();
 ////			BasicBlock mergebb = new BasicBlock();
