@@ -95,6 +95,7 @@ public abstract class Command {
 		load("type", "nez.x.TypeCommand");
 		load("dtd", "nez.x.DTDCommand");
 		load("minivm", "nez.x.minivm.MiniVMCommand");
+		load("pgen", "nez.x.parsergenerator.ParserGeneratorCommand");
 	}
 
 	public static final Command getCommand(String name) {
