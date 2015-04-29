@@ -169,15 +169,26 @@ public class CParserGenerator extends ParserGenerator {
 		this.file.writeIndent("ctx->cur++;");
 	}
 
+	private void printFunc(String name) {
+		this.file.writeIndent("dump_func(\"" + name + "\");");
+	}
+
+	private void dec() {
+		this.file.writeIndent("dec();");
+	}
+
 	@Override
 	public void visitRule(Rule e) {
 		this.initFalureJumpPoint();
 		this.file.writeIndent("int p" + e.getLocalName() + "(ParsingContext ctx)");
 		this.openBlock();
+		this.printFunc(e.getLocalName());
 		this.pushFailureJumpPoint();
 		e.getExpression().visit(this);
+		this.dec();
 		this.file.writeIndent("return 0;");
 		this.popFailureJumpPoint(e);
+		this.dec();
 		this.file.writeIndent("return 1;");
 		this.closeBlock();
 		this.file.writeNewLine();
@@ -242,22 +253,22 @@ public class CParserGenerator extends ParserGenerator {
 		boolean b[] = e.byteMap;
 		for (int start = 0; start < 256; start++) {
 			if (b[start]) {
-				int end = searchEndChar(b, start + 1);
-				if (start == end) {
-					this.file.writeIndent("if(*ctx->cur ==" + this.stringfyByte(start) + ")");
-					this.openBlock();
-					this.consume();
-					this.gotoLabel(label);
-					this.closeBlock();
-				}
-				else {
-					this.file.writeIndent("if(" + this.stringfyByte(start) + "<= *ctx->cur" + " && *ctx->cur <=" + this.stringfyByte(end) + ")");
-					this.openBlock();
-					this.consume();
-					this.gotoLabel(label);
-					this.closeBlock();
-					start = end;
-				}
+//				int end = searchEndChar(b, start + 1);
+//				if (start == end) {
+				this.file.writeIndent("if(*ctx->cur ==" + this.stringfyByte(start) + ")");
+				this.openBlock();
+				this.consume();
+				this.gotoLabel(label);
+				this.closeBlock();
+//				}
+//				else {
+//					this.file.writeIndent("if(" + this.stringfyByte(start) + "<= *ctx->cur" + " && *ctx->cur <=" + this.stringfyByte(end) + ")");
+//					this.openBlock();
+//					this.consume();
+//					this.gotoLabel(label);
+//					this.closeBlock();
+//					start = end;
+//				}
 			}
 		}
 		this.jumpFailureJump();
