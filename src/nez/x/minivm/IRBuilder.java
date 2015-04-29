@@ -63,9 +63,9 @@ public class IRBuilder {
 		return curBB.append(new PUSHpos(e));
 	}
 
-	public Instruction createPUSHmark(Expression e) {
-		return curBB.append(new PUSHmark(e));
-	}
+//	public Instruction createPUSHmark(Expression e) {
+//		return curBB.append(new PUSHmark(e));
+//	}
 
 	public Instruction createPOPpos(Expression e) {
 		return curBB.append(new POPpos(e));
@@ -83,33 +83,33 @@ public class IRBuilder {
 		return curBB.append(new STOREflag(e, val));
 	}
 
-	public Instruction createNEW(Expression e) {
-		return curBB.append(new NEW(e));
-	}
-
-	public Instruction createLEFTJOIN(Expression e, int index) {
-		return curBB.append(new LEFTJOIN(e, index));
-	}
-
-	public Instruction createCAPTURE(Expression e) {
-		return curBB.append(new CAPTURE(e));
-	}
-
-	public Instruction createCOMMIT(Expression e, int index) {
-		return curBB.append(new COMMIT(e, index));
-	}
-
-	public Instruction createABORT(Expression e) {
-		return curBB.append(new ABORT(e));
-	}
-
-	public Instruction createTAG(Expression e, String tag) {
-		return curBB.append(new TAG(e, tag));
-	}
-
-	public Instruction createVALUE(Expression e, String value) {
-		return curBB.append(new VALUE(e, value));
-	}
+//	public Instruction createNEW(Expression e) {
+//		return curBB.append(new NEW(e));
+//	}
+//
+//	public Instruction createLEFTJOIN(Expression e, int index) {
+//		return curBB.append(new LEFTJOIN(e, index));
+//	}
+//
+//	public Instruction createCAPTURE(Expression e) {
+//		return curBB.append(new CAPTURE(e));
+//	}
+//
+//	public Instruction createCOMMIT(Expression e, int index) {
+//		return curBB.append(new COMMIT(e, index));
+//	}
+//
+//	public Instruction createABORT(Expression e) {
+//		return curBB.append(new ABORT(e));
+//	}
+//
+//	public Instruction createTAG(Expression e, String tag) {
+//		return curBB.append(new TAG(e, tag));
+//	}
+//
+//	public Instruction createVALUE(Expression e, String value) {
+//		return curBB.append(new VALUE(e, value));
+//	}
 
 //	public Instruction createMEMOIZE(Expression e, int memoPoint) {
 //		return curBB.append(new MEMOIZE(e, memoPoint));

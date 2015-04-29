@@ -110,20 +110,20 @@ public class MiniVMCompiler extends GrammarVisitor {
 //		pos = write32(byteCode, poolSizeInfo, pos);
 
 		// rule table
-		int ruleSize = this.module.size();
-		pos = write32(byteCode, ruleSize, pos);
-		for (int i = 0; i < this.module.size(); i++) {
-			Function func = this.module.get(i);
-			byte[] ruleName = func.funcName.getBytes();
-			int ruleNamelen = ruleName.length;
-			long entryPoint = func.get(0).codeIndex;
-			pos = write32(byteCode, ruleNamelen, pos);
-			for (byte element : ruleName) {
-				byteCode[pos] = element;
-				pos++;
-			}
-			pos = write64(byteCode, entryPoint, pos);
-		}
+//		int ruleSize = this.module.size();
+//		pos = write32(byteCode, ruleSize, pos);
+//		for (int i = 0; i < this.module.size(); i++) {
+//			Function func = this.module.get(i);
+//			byte[] ruleName = func.funcName.getBytes();
+//			int ruleNamelen = ruleName.length;
+//			long entryPoint = func.get(0).codeIndex;
+//			pos = write32(byteCode, ruleNamelen, pos);
+//			for (byte element : ruleName) {
+//				byteCode[pos] = element;
+//				pos++;
+//			}
+//			pos = write64(byteCode, entryPoint, pos);
+//		}
 
 		// memo table size (use memo hash)
 //		int memoTableSize = this.memoMap.size();
@@ -244,18 +244,18 @@ public class MiniVMCompiler extends GrammarVisitor {
 		case STOREflag:
 			pos = write32(byteCode, ((STOREflag) code).val, pos);
 			break;
-		case LEFTJOIN:
-			pos = write32(byteCode, ((LEFTJOIN) code).index, pos);
-			break;
-		case COMMIT:
-			pos = write32(byteCode, ((COMMIT) code).index, pos);
-			break;
-		case TAG:
-			pos = writeCdataByteCode(byteCode, ((TAG) code).cdata, pos);
-			break;
-		case VALUE:
-			pos = writeCdataByteCode(byteCode, ((VALUE) code).cdata, pos);
-			break;
+//		case LEFTJOIN:
+//			pos = write32(byteCode, ((LEFTJOIN) code).index, pos);
+//			break;
+//		case COMMIT:
+//			pos = write32(byteCode, ((COMMIT) code).index, pos);
+//			break;
+//		case TAG:
+//			pos = writeCdataByteCode(byteCode, ((TAG) code).cdata, pos);
+//			break;
+//		case VALUE:
+//			pos = writeCdataByteCode(byteCode, ((VALUE) code).cdata, pos);
+//			break;
 		case NOTCHAR:
 			NOTCHAR nc = (NOTCHAR) code;
 			pos = write32(byteCode, nc.getc(0), pos);
@@ -1619,41 +1619,41 @@ public class MiniVMCompiler extends GrammarVisitor {
 	}
 
 	public void visitNew(New e) {
-		if (PatternMatching) {
-			for (int i = 0; i < e.size(); i++) {
-				if (this.option.useFusionInstruction) {
-					i = writeSequenceCode(e, i, e.size());
-				}
-				else {
-					e.get(i).visit(this);
-				}
-			}
-		}
-		else {
-			BasicBlock fbb = new BasicBlock();
-			this.pushFailureJumpPoint(fbb);
-			if (e.lefted) {
-				this.builder.createLEFTJOIN(e, 0);
-			}
-			else {
-				this.builder.createNEW(e);
-			}
-		}
+//		if (PatternMatching) {
+//			for (int i = 0; i < e.size(); i++) {
+//				if (this.option.useFusionInstruction) {
+//					i = writeSequenceCode(e, i, e.size());
+//				}
+//				else {
+//					e.get(i).visit(this);
+//				}
+//			}
+//		}
+//		else {
+//			BasicBlock fbb = new BasicBlock();
+//			this.pushFailureJumpPoint(fbb);
+//			if (e.lefted) {
+//				this.builder.createLEFTJOIN(e, 0);
+//			}
+//			else {
+//				this.builder.createNEW(e);
+//			}
+//		}
 	}
 
 	public void visitCapture(Capture e) {
-		if (!PatternMatching) {
-			BasicBlock mergebb = new BasicBlock();
-			this.builder.createCAPTURE(e);
-			this.builder.createPOPpos(e);
-			this.builder.createJUMP(e, mergebb);
-			BasicBlock fbb = this.popFailureJumpPoint(e);
-			this.setInsertPoint(fbb);
-			this.builder.createABORT(e);
-			this.builder.createJUMP(e, this.jumpFailureJump());
-			this.setInsertPoint(mergebb);
-			this.builder.setCurrentBB(mergebb);
-		}
+//		if (!PatternMatching) {
+//			BasicBlock mergebb = new BasicBlock();
+//			this.builder.createCAPTURE(e);
+//			this.builder.createPOPpos(e);
+//			this.builder.createJUMP(e, mergebb);
+//			BasicBlock fbb = this.popFailureJumpPoint(e);
+//			this.setInsertPoint(fbb);
+//			this.builder.createABORT(e);
+//			this.builder.createJUMP(e, this.jumpFailureJump());
+//			this.setInsertPoint(mergebb);
+//			this.builder.setCurrentBB(mergebb);
+//		}
 	}
 
 	public void visitLink(Link e) {
@@ -1686,33 +1686,33 @@ public class MiniVMCompiler extends GrammarVisitor {
 //			this.setInsertPoint(mergebb);
 //			this.builder.setCurrentBB(mergebb);
 //		}
-		else {
-			BasicBlock fbb = new BasicBlock();
-			BasicBlock mergebb = new BasicBlock();
-			this.pushFailureJumpPoint(fbb);
-			this.builder.createPUSHmark(e);
-			e.get(0).visit(this);
-			this.builder.createCOMMIT(e, e.index);
-			this.builder.createJUMP(e, mergebb);
-			this.popFailureJumpPoint(e);
-			this.setInsertPoint(fbb);
-			this.builder.createABORT(e);
-			this.builder.createJUMP(e, this.jumpFailureJump());
-			this.setInsertPoint(mergebb);
-			this.builder.setCurrentBB(mergebb);
-		}
+//		else {
+//			BasicBlock fbb = new BasicBlock();
+//			BasicBlock mergebb = new BasicBlock();
+//			this.pushFailureJumpPoint(fbb);
+//			this.builder.createPUSHmark(e);
+//			e.get(0).visit(this);
+//			this.builder.createCOMMIT(e, e.index);
+//			this.builder.createJUMP(e, mergebb);
+//			this.popFailureJumpPoint(e);
+//			this.setInsertPoint(fbb);
+//			this.builder.createABORT(e);
+//			this.builder.createJUMP(e, this.jumpFailureJump());
+//			this.setInsertPoint(mergebb);
+//			this.builder.setCurrentBB(mergebb);
+//		}
 	}
 
 	public void visitTagging(Tagging e) {
-		if (!this.PatternMatching) {
-			this.builder.createTAG(e, "#" + e.tag.toString());
-		}
+//		if (!this.PatternMatching) {
+//			this.builder.createTAG(e, "#" + e.tag.toString());
+//		}
 	}
 
 	public void visitReplace(Replace e) {
-		if (!this.PatternMatching) {
-			this.builder.createVALUE(e, e.value);
-		}
+//		if (!this.PatternMatching) {
+//			this.builder.createVALUE(e, e.value);
+//		}
 	}
 
 	@Override

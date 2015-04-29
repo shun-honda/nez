@@ -313,22 +313,22 @@ class PUSHpos extends StackOperateInstruction {
 	}
 }
 
-class PUSHmark extends StackOperateInstruction {
-	public PUSHmark(Expression expr) {
-		super(expr);
-		this.op = Opcode.PUSHmark;
-	}
-
-	@Override
-	protected void stringfy(StringBuilder sb) {
-		sb.append("  PUSHmark");
-	}
-
-	@Override
-	public String toString() {
-		return "PUSHmark";
-	}
-}
+//class PUSHmark extends StackOperateInstruction {
+//	public PUSHmark(Expression expr) {
+//		super(expr);
+//		this.op = Opcode.PUSHmark;
+//	}
+//
+//	@Override
+//	protected void stringfy(StringBuilder sb) {
+//		sb.append("  PUSHmark");
+//	}
+//
+//	@Override
+//	public String toString() {
+//		return "PUSHmark";
+//	}
+//}
 
 class GETpos extends StackOperateInstruction {
 	public GETpos(Expression expr) {
@@ -402,140 +402,140 @@ class STOREflag extends Instruction {
 	}
 }
 
-class NEW extends Instruction {
-	public NEW(Expression expr) {
-		super(expr);
-		this.op = Opcode.NEW;
-	}
-
-	@Override
-	protected void stringfy(StringBuilder sb) {
-		sb.append("  NEW");
-	}
-
-	@Override
-	public String toString() {
-		return "NEW";
-	}
-}
-
-class LEFTJOIN extends Instruction {
-	int index;
-
-	public LEFTJOIN(Expression expr, int index) {
-		super(expr);
-		this.op = Opcode.LEFTJOIN;
-		this.index = index;
-	}
-
-	@Override
-	protected void stringfy(StringBuilder sb) {
-		sb.append("  LEFTJOIN ");
-		sb.append(this.index);
-	}
-
-	@Override
-	public String toString() {
-		return "LEFTJOIN " + this.index;
-	}
-}
-
-class COMMIT extends Instruction {
-	int index;
-
-	public COMMIT(Expression expr, int index) {
-		super(expr);
-		this.op = Opcode.COMMIT;
-		this.index = index;
-	}
-
-	@Override
-	protected void stringfy(StringBuilder sb) {
-		sb.append("  COMMIT ");
-		sb.append(this.index);
-	}
-
-	@Override
-	public String toString() {
-		return "COMMIT " + this.index;
-	}
-}
-
-class ABORT extends Instruction {
-	public ABORT(Expression expr) {
-		super(expr);
-		this.op = Opcode.ABORT;
-	}
-
-	@Override
-	protected void stringfy(StringBuilder sb) {
-		sb.append("  ABORT");
-	}
-
-	@Override
-	public String toString() {
-		return "ABORT";
-	}
-}
-
-class CAPTURE extends Instruction {
-	public CAPTURE(Expression expr) {
-		super(expr);
-		this.op = Opcode.CAPTURE;
-	}
-
-	@Override
-	protected void stringfy(StringBuilder sb) {
-		sb.append("  CAPTURE");
-	}
-
-	@Override
-	public String toString() {
-		return "CAPTURE";
-	}
-}
-
-class TAG extends Instruction {
-	String cdata;
-
-	public TAG(Expression expr, String cdata) {
-		super(expr);
-		this.op = Opcode.TAG;
-		this.cdata = cdata;
-	}
-
-	@Override
-	protected void stringfy(StringBuilder sb) {
-		sb.append("  TAG ");
-		sb.append(this.cdata);
-	}
-
-	@Override
-	public String toString() {
-		return "TAG " + this.cdata;
-	}
-}
-
-class VALUE extends Instruction {
-	String cdata;
-
-	public VALUE(Expression expr, String cdata) {
-		super(expr);
-		this.op = Opcode.VALUE;
-		this.cdata = cdata;
-	}
-
-	@Override
-	protected void stringfy(StringBuilder sb) {
-		sb.append("  VALUE ");
-		sb.append(this.cdata);
-	}
-
-	@Override
-	public String toString() {
-		return "VALUE " + this.cdata;
-	}
-}
+//class NEW extends Instruction {
+//	public NEW(Expression expr) {
+//		super(expr);
+//		this.op = Opcode.NEW;
+//	}
+//
+//	@Override
+//	protected void stringfy(StringBuilder sb) {
+//		sb.append("  NEW");
+//	}
+//
+//	@Override
+//	public String toString() {
+//		return "NEW";
+//	}
+//}
+//
+//class LEFTJOIN extends Instruction {
+//	int index;
+//
+//	public LEFTJOIN(Expression expr, int index) {
+//		super(expr);
+//		this.op = Opcode.LEFTJOIN;
+//		this.index = index;
+//	}
+//
+//	@Override
+//	protected void stringfy(StringBuilder sb) {
+//		sb.append("  LEFTJOIN ");
+//		sb.append(this.index);
+//	}
+//
+//	@Override
+//	public String toString() {
+//		return "LEFTJOIN " + this.index;
+//	}
+//}
+//
+//class COMMIT extends Instruction {
+//	int index;
+//
+//	public COMMIT(Expression expr, int index) {
+//		super(expr);
+//		this.op = Opcode.COMMIT;
+//		this.index = index;
+//	}
+//
+//	@Override
+//	protected void stringfy(StringBuilder sb) {
+//		sb.append("  COMMIT ");
+//		sb.append(this.index);
+//	}
+//
+//	@Override
+//	public String toString() {
+//		return "COMMIT " + this.index;
+//	}
+//}
+//
+//class ABORT extends Instruction {
+//	public ABORT(Expression expr) {
+//		super(expr);
+//		this.op = Opcode.ABORT;
+//	}
+//
+//	@Override
+//	protected void stringfy(StringBuilder sb) {
+//		sb.append("  ABORT");
+//	}
+//
+//	@Override
+//	public String toString() {
+//		return "ABORT";
+//	}
+//}
+//
+//class CAPTURE extends Instruction {
+//	public CAPTURE(Expression expr) {
+//		super(expr);
+//		this.op = Opcode.CAPTURE;
+//	}
+//
+//	@Override
+//	protected void stringfy(StringBuilder sb) {
+//		sb.append("  CAPTURE");
+//	}
+//
+//	@Override
+//	public String toString() {
+//		return "CAPTURE";
+//	}
+//}
+//
+//class TAG extends Instruction {
+//	String cdata;
+//
+//	public TAG(Expression expr, String cdata) {
+//		super(expr);
+//		this.op = Opcode.TAG;
+//		this.cdata = cdata;
+//	}
+//
+//	@Override
+//	protected void stringfy(StringBuilder sb) {
+//		sb.append("  TAG ");
+//		sb.append(this.cdata);
+//	}
+//
+//	@Override
+//	public String toString() {
+//		return "TAG " + this.cdata;
+//	}
+//}
+//
+//class VALUE extends Instruction {
+//	String cdata;
+//
+//	public VALUE(Expression expr, String cdata) {
+//		super(expr);
+//		this.op = Opcode.VALUE;
+//		this.cdata = cdata;
+//	}
+//
+//	@Override
+//	protected void stringfy(StringBuilder sb) {
+//		sb.append("  VALUE ");
+//		sb.append(this.cdata);
+//	}
+//
+//	@Override
+//	public String toString() {
+//		return "VALUE " + this.cdata;
+//	}
+//}
 
 //class MEMOIZE extends Instruction {
 //	int memoPoint;
