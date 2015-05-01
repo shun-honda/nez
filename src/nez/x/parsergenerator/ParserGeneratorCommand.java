@@ -35,7 +35,7 @@ public class ParserGeneratorCommand extends Command {
 	}
 
 	static {
-		regist("c", "nez.x.parsergenerator.CParserGenerator");
+		regist("c", "nez.x.parsergenerator.SlowCParserGenerator");
 	}
 
 	final ParserGenerator loadGenerator(String output, Grammar peg) {
