@@ -130,24 +130,6 @@ class IFFAIL extends JumpInstruction {
 	}
 }
 
-class IFSUCC extends JumpInstruction {
-	public IFSUCC(Expression expr, BasicBlock jump) {
-		super(expr, jump);
-		this.op = Opcode.IFSUCC;
-	}
-
-	@Override
-	protected void stringfy(StringBuilder sb) {
-		sb.append("  IFFAIL ");
-		sb.append("jump:" + this.jump.getBBName());
-	}
-
-	@Override
-	public String toString() {
-		return "CONDBRANCH " + this.jump.codeIndex;
-	}
-}
-
 abstract class MatchingInstruction extends Instruction {
 	List<Integer> cdata;
 
@@ -689,30 +671,6 @@ class NOTSTRING extends JumpMatchingInstruction {
 		}
 		sb.append(this.jump.codeIndex);
 		return sb.toString();
-	}
-}
-
-class NOTCHARANY extends JumpMatchingInstruction {
-	public NOTCHARANY(Expression expr, BasicBlock jump, int... cdata) {
-		super(expr, jump, cdata);
-		this.op = Opcode.NOTCHARANY;
-	}
-
-	public void addBasicBlock(int index, BasicBlock bb) {
-		this.parent = bb;
-		this.parent.add(index, this);
-	}
-
-	@Override
-	protected void stringfy(StringBuilder sb) {
-		sb.append("  NOTCHARANY ");
-		sb.append(this.getc(0));
-		sb.append(" jump:" + this.jump.getBBName());
-	}
-
-	@Override
-	public String toString() {
-		return "NOTCHARANY " + this.getc(0) + " " + this.jump.codeIndex;
 	}
 }
 

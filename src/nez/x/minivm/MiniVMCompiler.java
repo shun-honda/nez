@@ -3,6 +3,7 @@ package nez.x.minivm;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import nez.Grammar;
@@ -110,8 +111,17 @@ public class MiniVMCompiler extends GrammarVisitor {
 //		pos = write32(byteCode, poolSizeInfo, pos);
 
 		// rule table
-//		int ruleSize = this.module.size();
-//		pos = write32(byteCode, ruleSize, pos);
+		int ruleSize = this.callTable.size();
+		pos = write32(byteCode, ruleSize, pos);
+
+		// set table
+		int charMapTableSize = this.charMapTable.size();
+		pos = write32(byteCode, charMapTableSize, pos);
+
+		// str table
+		int strTableSize = this.strTable.size();
+		pos = write32(byteCode, strTableSize, pos);
+
 //		for (int i = 0; i < this.module.size(); i++) {
 //			Function func = this.module.get(i);
 //			byte[] ruleName = func.funcName.getBytes();
@@ -167,6 +177,12 @@ public class MiniVMCompiler extends GrammarVisitor {
 		}
 	}
 
+	private int writeByte(byte[] byteCode, byte num, int pos) {
+		byteCode[pos] = num;
+		pos++;
+		return pos;
+	}
+
 	private int write16(byte[] byteCode, long num, int pos) {
 		byteCode[pos] = (byte) (0x000000ff & num);
 		pos++;
@@ -210,39 +226,45 @@ public class MiniVMCompiler extends GrammarVisitor {
 		pos++;
 		switch (code.op) {
 		case JUMP:
-			pos = write32(byteCode, ((JUMP) code).jump.codeIndex - index, pos);
+			byteCode[pos++] = (byte) (((JUMP) code).jump.codeIndex - index);
 			break;
 		case CALL:
-			pos = write32(byteCode, ((CALL) code).jumpIndex - index, pos);
+			CALL call = (CALL) code;
+			int n = this.callTable.indexOf(call);
+			//System.out.println(n);
+			byteCode[pos++] = (byte) n;
+			pos = write32(byteCode, call.jumpIndex - index, pos);
 			break;
 		case IFFAIL:
-		case IFSUCC:
-			pos = write32(byteCode, ((JumpInstruction) code).jump.codeIndex - index, pos);
+//			pos = write32(byteCode, ((JumpInstruction) code).jump.codeIndex - index, pos);
+			byteCode[pos++] = (byte) (((JumpInstruction) code).jump.codeIndex - index);
 			break;
 		case CHAR:
-			pos = write32(byteCode, ((CHAR) code).getc(0), pos);
-			pos = write32(byteCode, ((CHAR) code).jump.codeIndex - index, pos);
+			pos = writeByte(byteCode, (byte) ((CHAR) code).getc(0), pos);
+//			pos = write32(byteCode, ((CHAR) code).jump.codeIndex - index, pos);
 			break;
 		case CHARMAP:
+			pos = writeByte(byteCode, (byte) this.charMapTable.indexOf((MatchingInstruction) code), pos);
 			CHARMAP charset = (CHARMAP) code;
 			pos = write16(byteCode, charset.size(), pos);
 			for (int j = 0; j < charset.size(); j++) {
-				pos = write32(byteCode, charset.getc(j), pos);
+				pos = writeByte(byteCode, (byte) charset.getc(j), pos);
 			}
 			pos = write32(byteCode, charset.jump.codeIndex - index, pos);
 			break;
 		case STRING:
+			pos = writeByte(byteCode, (byte) this.strTable.indexOf((MatchingInstruction) code), pos);
 			pos = write16(byteCode, ((STRING) code).size(), pos);
 			for (int j = 0; j < ((STRING) code).size(); j++) {
-				pos = write32(byteCode, ((STRING) code).getc(j), pos);
+				pos = writeByte(byteCode, (byte) ((STRING) code).getc(j), pos);
 			}
 			pos = write32(byteCode, ((STRING) code).jump.codeIndex - index, pos);
 			break;
 		case ANY:
-			pos = write32(byteCode, ((ANY) code).jump.codeIndex - index, pos);
+//			pos = write32(byteCode, ((ANY) code).jump.codeIndex - index, pos);
 			break;
 		case STOREflag:
-			pos = write32(byteCode, ((STOREflag) code).val, pos);
+			pos = writeByte(byteCode, (byte) ((STOREflag) code).val, pos);
 			break;
 //		case LEFTJOIN:
 //			pos = write32(byteCode, ((LEFTJOIN) code).index, pos);
@@ -257,53 +279,54 @@ public class MiniVMCompiler extends GrammarVisitor {
 //			pos = writeCdataByteCode(byteCode, ((VALUE) code).cdata, pos);
 //			break;
 		case NOTCHAR:
+			pos = writeByte(byteCode, (byte) this.strTable.indexOf((MatchingInstruction) code), pos);
 			NOTCHAR nc = (NOTCHAR) code;
-			pos = write32(byteCode, nc.getc(0), pos);
+			pos = writeByte(byteCode, (byte) nc.getc(0), pos);
 			pos = write32(byteCode, nc.jump.codeIndex - index, pos);
 			break;
 		case NOTCHARMAP:
+			pos = writeByte(byteCode, (byte) this.charMapTable.indexOf((MatchingInstruction) code), pos);
 			NOTCHARMAP ncs = (NOTCHARMAP) code;
 			pos = write16(byteCode, ncs.size(), pos);
 			for (int j = 0; j < ncs.size(); j++) {
-				pos = write32(byteCode, ncs.getc(j), pos);
+				pos = writeByte(byteCode, (byte) ncs.getc(j), pos);
 			}
 			pos = write32(byteCode, ncs.jump.codeIndex - index, pos);
 			break;
 		case NOTSTRING:
+			pos = writeByte(byteCode, (byte) this.strTable.indexOf((MatchingInstruction) code), pos);
 			NOTSTRING ns = (NOTSTRING) code;
 			pos = write16(byteCode, ns.size(), pos);
 			for (int j = 0; j < ns.size(); j++) {
-				pos = write32(byteCode, ns.getc(j), pos);
+				pos = writeByte(byteCode, (byte) ns.getc(j), pos);
 			}
 			pos = write32(byteCode, ns.jump.codeIndex - index, pos);
 			break;
-		case NOTCHARANY:
-			NOTCHARANY nca = (NOTCHARANY) code;
-			pos = write32(byteCode, nca.getc(0), pos);
-			pos = write32(byteCode, nca.jump.codeIndex - index, pos);
-			break;
 		case OPTIONALCHAR:
-			pos = write32(byteCode, ((OPTIONALCHAR) code).getc(0), pos);
+			pos = writeByte(byteCode, (byte) ((OPTIONALCHAR) code).getc(0), pos);
 			break;
 		case OPTIONALCHARMAP:
+			pos = writeByte(byteCode, (byte) this.charMapTable.indexOf((MatchingInstruction) code), pos);
 			OPTIONALCHARMAP ocs = (OPTIONALCHARMAP) code;
 			pos = write16(byteCode, ocs.size(), pos);
 			for (int j = 0; j < ocs.size(); j++) {
-				pos = write32(byteCode, ocs.getc(j), pos);
+				pos = writeByte(byteCode, (byte) ocs.getc(j), pos);
 			}
 			break;
 		case OPTIONALSTRING:
+			pos = writeByte(byteCode, (byte) this.strTable.indexOf((MatchingInstruction) code), pos);
 			OPTIONALSTRING os = (OPTIONALSTRING) code;
 			pos = write16(byteCode, os.size(), pos);
 			for (int j = 0; j < os.size(); j++) {
-				pos = write32(byteCode, os.getc(j), pos);
+				pos = writeByte(byteCode, (byte) os.getc(j), pos);
 			}
 			break;
 		case ZEROMORECHARMAP:
+			pos = writeByte(byteCode, (byte) this.charMapTable.indexOf((MatchingInstruction) code), pos);
 			ZEROMORECHARMAP zcs = (ZEROMORECHARMAP) code;
 			pos = write16(byteCode, zcs.size(), pos);
 			for (int j = 0; j < zcs.size(); j++) {
-				pos = write32(byteCode, zcs.getc(j), pos);
+				pos = writeByte(byteCode, (byte) zcs.getc(j), pos);
 			}
 			break;
 		default:
@@ -409,6 +432,9 @@ public class MiniVMCompiler extends GrammarVisitor {
 	}
 
 	HashMap<String, Integer> callMap = new HashMap<String, Integer>();
+	ArrayList<CALL> callTable = new ArrayList<CALL>();
+	ArrayList<MatchingInstruction> strTable = new ArrayList<MatchingInstruction>();
+	ArrayList<MatchingInstruction> charMapTable = new ArrayList<MatchingInstruction>();
 
 	private void labeling() {
 		int codeIndex = 0;
@@ -431,6 +457,15 @@ public class MiniVMCompiler extends GrammarVisitor {
 					if (inst instanceof CALL) {
 						CALL cinst = (CALL) inst;
 						cinst.jumpIndex = this.callMap.get(cinst.ruleName);
+						this.callTable.add(cinst);
+					}
+					else if (inst instanceof STRING || inst instanceof NOTSTRING || inst instanceof OPTIONALSTRING || inst instanceof NOTCHAR) {
+						MatchingInstruction si = (MatchingInstruction) inst;
+						this.strTable.add(si);
+					}
+					else if (inst instanceof CHARMAP || inst instanceof NOTCHARMAP || inst instanceof OPTIONALCHARMAP || inst instanceof ZEROMORECHARMAP) {
+						MatchingInstruction si = (MatchingInstruction) inst;
+						this.charMapTable.add(si);
 					}
 				}
 			}
@@ -516,6 +551,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 			return index++;
 		}
 		STRING str = (STRING) this.builder.createSTRING(e, this.jumpFailureJump());
+//		this.builder.createIFFAIL(e, this.jumpFailureJump());
 		for (int i = index; i < index + count; i++) {
 			str.append(((ByteChar) e.get(i)).byteChar);
 		}
@@ -632,6 +668,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	private void writeCharsetCode(Expression e, int index, int charCount) {
 		CHARMAP inst = (CHARMAP) this.builder.createCHARMAP(e, this.jumpFailureJump());
+//		this.builder.createIFFAIL(e, this.jumpFailureJump());
 		for (int i = index; i < index + charCount; i++) {
 			if (e.get(i) instanceof ByteChar) {
 				inst.append(((ByteChar) e.get(i)).byteChar);
@@ -791,6 +828,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 		}
 		if (inner instanceof ByteChar) {
 			this.builder.createNOTCHAR(inner, this.jumpFailureJump(), ((ByteChar) inner).byteChar);
+//			this.builder.createIFFAIL(inner, this.jumpFailureJump());
 			return true;
 		}
 		if (inner instanceof ByteMap) {
@@ -801,17 +839,20 @@ public class MiniVMCompiler extends GrammarVisitor {
 					inst.append(c);
 				}
 			}
+//			this.builder.createIFFAIL(inner, this.jumpFailureJump());
 			return true;
 		}
 		if (inner instanceof Choice) {
 			if (checkCharMap((Choice) inner)) {
 				writeNotCharMapCode((Choice) inner);
+//				this.builder.createIFFAIL(inner, this.jumpFailureJump());
 				return true;
 			}
 		}
 		if (inner instanceof Sequence) {
 			if (checkString((Sequence) inner)) {
 				writeNotStringCode((Sequence) inner);
+//				this.builder.createIFFAIL(inner, this.jumpFailureJump());
 				return true;
 			}
 		}
@@ -1135,6 +1176,9 @@ public class MiniVMCompiler extends GrammarVisitor {
 	int ruleSize;
 
 	public void visitNonTerminal(NonTerminal e) {
+		if (inlining) {
+			return;
+		}
 		if (this.option.useInlining) {
 			RuleReferences r = this.analyzer.ruleAnalysisMap.get(e.getLocalName());
 			BasicBlock currentBB = this.builder.getCurrentBB();
@@ -1144,6 +1188,24 @@ public class MiniVMCompiler extends GrammarVisitor {
 					Expression ne = getNonTerminalRule(e);
 					this.builder.setCurrentBB(new BasicBlock(this.func));
 					ne.visit(this);
+					return;
+				}
+			}
+			else {
+				Expression ne = getNonTerminalRule(e);
+				int index = this.func.size();
+				this.ruleSize = this.func.instSize();
+				this.inlining = true;
+				this.builder.setCurrentBB(new BasicBlock(func));
+				ne.visit(this);
+				this.inlining = false;
+				if (this.func.instSize() - this.ruleSize > 1) {
+					int size = this.func.size();
+					for (int i = index; i < size; i++) {
+						this.func.remove(index);
+					}
+				}
+				else {
 					return;
 				}
 			}
@@ -1192,6 +1254,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	public void visitByteChar(ByteChar e) {
 		this.builder.createCHAR(e, this.jumpFailureJump(), e.byteChar);
+		this.builder.createIFFAIL(e, this.jumpFailureJump());
 	}
 
 	public void visitByteMap(ByteMap e) {
@@ -1202,12 +1265,12 @@ public class MiniVMCompiler extends GrammarVisitor {
 					inst.append(c);
 				}
 			}
+//			this.builder.createIFFAIL(e, this.jumpFailureJump());
 		}
 		else {
 			BasicBlock fbb = null;
 			BasicBlock endbb = new BasicBlock();
 			BasicBlock mergebb = new BasicBlock();
-			this.builder.createPUSHpos(e);
 			int max = 0;
 			for (int i = 0; i < 256; i++) {
 				if (e.byteMap[i]) {
@@ -1218,27 +1281,24 @@ public class MiniVMCompiler extends GrammarVisitor {
 				if (e.byteMap[i]) {
 					fbb = new BasicBlock();
 					this.builder.createCHAR(e, fbb, i);
+					this.builder.createIFFAIL(e, fbb);
 					this.builder.createJUMP(e, endbb);
 					this.setInsertPoint(fbb);
 					if (i != max) {
 						this.builder.createSTOREflag(e, 0);
-						this.builder.createGETpos(e);
-					}
-					else {
-						this.builder.createSTOREpos(e);
 					}
 					this.builder.setCurrentBB(fbb);
 				}
 			}
 			this.builder.createJUMP(e, this.jumpFailureJump());
 			this.setInsertPoint(endbb);
-			this.builder.createPOPpos(e);
 			this.setInsertPoint(mergebb);
 		}
 	}
 
 	public void visitAnyChar(AnyChar e) {
 		this.builder.createANY(e, this.jumpFailureJump());
+		this.builder.createIFFAIL(e, this.jumpFailureJump());
 	}
 
 	public void visitNot(Not e) {

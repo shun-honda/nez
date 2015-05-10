@@ -39,10 +39,6 @@ public class IRBuilder {
 		return curBB.append(new IFFAIL(e, jump));
 	}
 
-	public Instruction createIFSUCC(Expression e, BasicBlock jump) {
-		return curBB.append(new IFSUCC(e, jump));
-	}
-
 	public Instruction createCHAR(Expression e, BasicBlock jump, int byteChar) {
 		return curBB.append(new CHAR(e, jump, byteChar));
 	}
@@ -141,10 +137,6 @@ public class IRBuilder {
 
 	public Instruction createNOTSTRING(Expression e, BasicBlock jump) {
 		return curBB.append(new NOTSTRING(e, jump));
-	}
-
-	public Instruction createNOTCHARANY(Expression e, BasicBlock jump) {
-		return curBB.append(new NOTCHARANY(e, jump));
 	}
 
 	public Instruction createOPTIONALCHAR(Expression e) {
