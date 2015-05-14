@@ -75,8 +75,12 @@ public class IRBuilder {
 		return curBB.append(new STOREpos(e));
 	}
 
-	public Instruction createSTOREflag(Expression e, int val) {
-		return curBB.append(new STOREflag(e, val));
+	public Instruction createSUCC(Expression e) {
+		return curBB.append(new SUCC(e));
+	}
+
+	public Instruction createFAIL(Expression e) {
+		return curBB.append(new FAIL(e));
 	}
 
 //	public Instruction createNEW(Expression e) {

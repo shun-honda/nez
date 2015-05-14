@@ -1,9 +1,11 @@
 package nez.x.minivm;
 
 public enum Opcode {
-	EXIT,
-	JUMP,
-	CALL,
+	exit,
+	succ,
+	fail,
+	jump,
+	call,
 	RET,
 	IFFAIL,
 	CHAR,
@@ -14,7 +16,6 @@ public enum Opcode {
 	POPpos,
 	GETpos,
 	STOREpos,
-	STOREflag,
 	NOTCHAR,
 	NOTCHARMAP,
 	NOTSTRING,

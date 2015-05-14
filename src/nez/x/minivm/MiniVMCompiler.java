@@ -225,10 +225,11 @@ public class MiniVMCompiler extends GrammarVisitor {
 		byteCode[pos] = (byte) code.op.ordinal();
 		pos++;
 		switch (code.op) {
-		case JUMP:
-			byteCode[pos++] = (byte) (((JUMP) code).jump.codeIndex - index);
+		case jump:
+//			byteCode[pos++] = (byte) (((JUMP) code).jump.codeIndex - index);
+			pos = write16(byteCode, ((JUMP) code).jump.codeIndex - index, pos);
 			break;
-		case CALL:
+		case call:
 			CALL call = (CALL) code;
 			int n = this.callTable.indexOf(call);
 			//System.out.println(n);
@@ -237,7 +238,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 			break;
 		case IFFAIL:
 //			pos = write32(byteCode, ((JumpInstruction) code).jump.codeIndex - index, pos);
-			byteCode[pos++] = (byte) (((JumpInstruction) code).jump.codeIndex - index);
+			pos = write16(byteCode, ((JumpInstruction) code).jump.codeIndex - index, pos);
 			break;
 		case CHAR:
 			pos = writeByte(byteCode, (byte) ((CHAR) code).getc(0), pos);
@@ -262,9 +263,6 @@ public class MiniVMCompiler extends GrammarVisitor {
 			break;
 		case ANY:
 //			pos = write32(byteCode, ((ANY) code).jump.codeIndex - index, pos);
-			break;
-		case STOREflag:
-			pos = writeByte(byteCode, (byte) ((STOREflag) code).val, pos);
 			break;
 //		case LEFTJOIN:
 //			pos = write32(byteCode, ((LEFTJOIN) code).index, pos);
@@ -710,13 +708,13 @@ public class MiniVMCompiler extends GrammarVisitor {
 				e.get(0).visit(this);
 				if (this.lastChoiceElementIsUnary) {
 					this.builder.createSTOREpos(e);
-					this.builder.createSTOREflag(e, 1);
+					this.builder.createFAIL(e);
 					this.builder.createJUMP(e, this.jumpPrevFailureJump());
 					this.popFailureJumpPoint(e);
 					this.setInsertPoint(fbb);
 					this.builder.setCurrentBB(fbb);
 					this.builder.createGETpos(e);
-					this.builder.createSTOREflag(e, 0);
+					this.builder.createSUCC(e);
 					return;
 				}
 				else {
@@ -726,7 +724,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 					this.setInsertPoint(fbb);
 					this.builder.setCurrentBB(fbb);
 					this.builder.createGETpos(e);
-					this.builder.createSTOREflag(e, 0);
+					this.builder.createSUCC(e);
 					return;
 				}
 			}
@@ -736,13 +734,13 @@ public class MiniVMCompiler extends GrammarVisitor {
 		this.builder.createPUSHpos(e);
 		e.get(0).visit(this);
 		this.builder.createSTOREpos(e);
-		this.builder.createSTOREflag(e, 1);
+		this.builder.createFAIL(e);
 		this.builder.createJUMP(e, this.jumpPrevFailureJump());
 		this.popFailureJumpPoint(e);
 		this.setInsertPoint(fbb);
 		this.builder.setCurrentBB(fbb);
 		this.builder.createSTOREpos(e);
-		this.builder.createSTOREflag(e, 0);
+		this.builder.createSUCC(e);
 	}
 
 //	private void writeSCNotCode(Not e) {
@@ -870,7 +868,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 					this.builder.createJUMP(e, mergebb);
 					this.popFailureJumpPoint(e);
 					this.setInsertPoint(fbb);
-					this.builder.createSTOREflag(e, 0);
+					this.builder.createSUCC(e);
 					this.builder.createGETpos(e);
 					this.builder.setCurrentBB(mergebb);
 					this.setInsertPoint(mergebb);
@@ -879,7 +877,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 					this.builder.createJUMP(e, mergebb);
 					this.popFailureJumpPoint(e);
 					this.setInsertPoint(fbb);
-					this.builder.createSTOREflag(e, 0);
+					this.builder.createSUCC(e);
 					this.builder.createGETpos(e);
 					this.builder.setCurrentBB(mergebb);
 					this.setInsertPoint(mergebb);
@@ -896,7 +894,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 		this.builder.createJUMP(e, mergebb);
 		this.popFailureJumpPoint(e);
 		this.setInsertPoint(fbb);
-		this.builder.createSTOREflag(e, 0);
+		this.builder.createSUCC(e);
 		this.builder.createSTOREpos(e);
 		this.builder.setCurrentBB(mergebb);
 		this.setInsertPoint(mergebb);
@@ -1050,7 +1048,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 		this.builder.createJUMP(e, bb);
 		this.popFailureJumpPoint(e);
 		this.setInsertPoint(fbb);
-		this.builder.createSTOREflag(e, 0);
+		this.builder.createSUCC(e);
 		this.builder.createSTOREpos(e);
 		this.setInsertPoint(mergebb);
 		this.builder.setCurrentBB(mergebb);
@@ -1249,7 +1247,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 	}
 
 	public void visitFailure(Failure e) {
-		this.builder.createSTOREflag(e, 1);
+		this.builder.createFAIL(e);
 	}
 
 	public void visitByteChar(ByteChar e) {
@@ -1285,7 +1283,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 					this.builder.createJUMP(e, endbb);
 					this.setInsertPoint(fbb);
 					if (i != max) {
-						this.builder.createSTOREflag(e, 0);
+						this.builder.createSUCC(e);
 					}
 					this.builder.setCurrentBB(fbb);
 				}
@@ -1440,7 +1438,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 								this.popFailureJumpPoint(inner);
 								this.setInsertPoint(fbb);
 								if (i != e.size() - 1) {
-									this.builder.createSTOREflag(e, 0);
+									this.builder.createSUCC(e);
 									this.builder.createGETpos(e);
 								}
 								this.builder.setCurrentBB(fbb);
@@ -1476,7 +1474,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 							this.popFailureJumpPoint(e.get(i));
 							this.setInsertPoint(fbb);
 							if (i != e.size() - 1) {
-								this.builder.createSTOREflag(e, 0);
+								this.builder.createSUCC(e);
 								this.builder.createGETpos(e);
 							}
 							this.builder.setCurrentBB(fbb);
@@ -1519,7 +1517,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 							this.popFailureJumpPoint(inner);
 							this.setInsertPoint(fbb);
 							if (i != e.size() - 1) {
-								this.builder.createSTOREflag(e, 0);
+								this.builder.createSUCC(e);
 								this.builder.createGETpos(e);
 							}
 							else {
@@ -1542,7 +1540,6 @@ public class MiniVMCompiler extends GrammarVisitor {
 							this.popFailureJumpPoint(inner);
 							this.setInsertPoint(fbb);
 						}
-						this.popFailureJumpPoint(inner);
 						this.setInsertPoint(fbb);
 					}
 				}
@@ -1574,7 +1571,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 						this.popFailureJumpPoint(e.get(i));
 						this.setInsertPoint(fbb);
 						if (i != e.size() - 1) {
-							this.builder.createSTOREflag(e, 0);
+							this.builder.createSUCC(e);
 							this.builder.createGETpos(e);
 						}
 						else {
@@ -1632,7 +1629,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 						this.popFailureJumpPoint(inner);
 						this.setInsertPoint(fbb);
 						if (i != e.size() - 1) {
-							this.builder.createSTOREflag(e, 0);
+							this.builder.createSUCC(e);
 							this.builder.createGETpos(e);
 						}
 						else {
@@ -1662,7 +1659,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 					this.popFailureJumpPoint(e.get(i));
 					this.setInsertPoint(fbb);
 					if (i != e.size() - 1) {
-						this.builder.createSTOREflag(e, 0);
+						this.builder.createSUCC(e);
 						this.builder.createGETpos(e);
 					}
 					else {

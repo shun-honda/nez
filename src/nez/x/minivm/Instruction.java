@@ -28,7 +28,7 @@ public abstract class Instruction {
 class EXIT extends Instruction {
 	public EXIT(Expression expr) {
 		super(expr);
-		this.op = Opcode.EXIT;
+		this.op = Opcode.exit;
 	}
 
 	@Override
@@ -48,7 +48,7 @@ class CALL extends Instruction {
 
 	public CALL(Expression expr, String ruleName) {
 		super(expr);
-		this.op = Opcode.CALL;
+		this.op = Opcode.call;
 		this.ruleName = ruleName;
 	}
 
@@ -97,7 +97,7 @@ abstract class JumpInstruction extends Instruction {
 class JUMP extends JumpInstruction {
 	public JUMP(Expression expr, BasicBlock jump) {
 		super(expr, jump);
-		this.op = Opcode.JUMP;
+		this.op = Opcode.jump;
 	}
 
 	@Override
@@ -363,24 +363,39 @@ class POPpos extends StackOperateInstruction {
 	}
 }
 
-class STOREflag extends Instruction {
-	int val;
+class SUCC extends Instruction {
 
-	public STOREflag(Expression expr, int val) {
+	public SUCC(Expression expr) {
 		super(expr);
-		this.op = Opcode.STOREflag;
-		this.val = val;
+		this.op = Opcode.succ;
 	}
 
 	@Override
 	protected void stringfy(StringBuilder sb) {
-		sb.append("  STOREflag");
-		sb.append(this.val);
+		sb.append("  SUCC");
 	}
 
 	@Override
 	public String toString() {
-		return "STOREflag " + this.val;
+		return "SUCC";
+	}
+}
+
+class FAIL extends Instruction {
+
+	public FAIL(Expression expr) {
+		super(expr);
+		this.op = Opcode.fail;
+	}
+
+	@Override
+	protected void stringfy(StringBuilder sb) {
+		sb.append("  FAIL");
+	}
+
+	@Override
+	public String toString() {
+		return "FAIL";
 	}
 }
 
