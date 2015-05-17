@@ -74,7 +74,7 @@ public class SlowCParserGenerator extends ParserGenerator {
 		this.openBlock();
 		this.file.writeIndent("nez_PrintErrorInfo(\"parse error\");");
 		this.closeBlock();
-		this.file.writeIndent("else if((ctx->cur - ctx->inputs) != ctx->input_size)");
+		this.file.writeIndent("else if((ctx->pos) != ctx->input_size)");
 		this.openBlock();
 		this.file.writeIndent("nez_PrintErrorInfo(\"unconsume\");");
 		this.closeBlock();
@@ -179,7 +179,19 @@ public class SlowCParserGenerator extends ParserGenerator {
 	}
 
 	private void consume() {
-		this.file.writeIndent("ctx->cur++;");
+		this.file.writeIndent("ctx->pos++;");
+	}
+
+	private void backtrack(String pos) {
+		this.file.writeIndent("ctx->pos = " + pos + ";");
+	}
+
+	private String match(String match) {
+		return "nez_match(ctx, " + match + ")";
+	}
+
+	private String not_match(String match) {
+		return "nez_not_match(ctx, " + match + ")";
 	}
 
 	private void printFunc(String name) {
@@ -291,7 +303,7 @@ public class SlowCParserGenerator extends ParserGenerator {
 	public void visitByteChar(ByteChar e) {
 		if (this.funcDecl("int", "pByteChar" + e.getId(), "ParsingContext ctx", e)) {
 			this.openBlock();
-			this.If("*ctx->cur != " + this.stringfyByte(e.byteChar));
+			this.If("ctx->inputs[ctx->pos] != " + this.stringfyByte(e.byteChar));
 			this.openBlock();
 			this.returnVal("0");
 			this.closeBlock();
@@ -316,11 +328,12 @@ public class SlowCParserGenerator extends ParserGenerator {
 		boolean b[] = e.byteMap;
 		if (this.funcDecl("int", "pByteMap" + e.getId(), "ParsingContext ctx", e)) {
 			this.openBlock();
+			this.let("int", "result", "0");
 			for (int start = 0; start < 256; start++) {
 				if (b[start]) {
 //				int end = searchEndChar(b, start + 1);
 //				if (start == end) {
-					this.If("*ctx->cur ==" + this.stringfyByte(start));
+					this.If(this.match(this.stringfyByte(start)));
 					this.openBlock();
 					this.consume();
 					this.returnVal("1");
@@ -336,7 +349,11 @@ public class SlowCParserGenerator extends ParserGenerator {
 //				}
 				}
 			}
-			this.returnVal("0");
+//			this.file.writeIndent("if(result == 1)");
+//			this.openBlock();
+//			this.consume();
+//			this.closeBlock();
+			this.returnVal("result");
 			this.closeBlock();
 			this.file.writeNewLine();
 		}
@@ -346,12 +363,30 @@ public class SlowCParserGenerator extends ParserGenerator {
 	public void visitAnyChar(AnyChar e) {
 		if (this.funcDecl("int", "pAnyChar" + e.getId(), "ParsingContext ctx", e)) {
 			this.openBlock();
-			this.If("*ctx->cur == 0");
-			this.openBlock();
-			this.returnVal("0");
-			this.closeBlock();
-			this.consume();
-			this.returnVal("1");
+			this.let("int", "result", "0");
+			for (int start = 1; start < 256; start++) {
+//				int end = searchEndChar(b, start + 1);
+//				if (start == end) {
+				this.If(this.match("(char)" + start));
+				this.openBlock();
+				this.consume();
+				this.returnVal("1");
+				this.closeBlock();
+//				}
+//				else {
+//					this.file.writeIndent("if(" + this.stringfyByte(start) + "<= *ctx->cur" + " && *ctx->cur <=" + this.stringfyByte(end) + ")");
+//					this.openBlock();
+//					this.consume();
+//					this.gotoLabel(label);
+//					this.closeBlock();
+//					start = end;
+//				}
+			}
+//			this.file.writeIndent("if(result == 1)");
+//			this.openBlock();
+//			this.consume();
+//			this.closeBlock();
+			this.returnVal("result");
 			this.closeBlock();
 			this.file.writeNewLine();
 		}
@@ -361,15 +396,15 @@ public class SlowCParserGenerator extends ParserGenerator {
 	public void visitNot(Not e) {
 		if (this.funcDecl("int", "pNot" + e.getId(), "ParsingContext ctx", e)) {
 			this.openBlock();
-			String backtrack = "c" + this.fid;
+			String backtrack = "pos" + this.fid;
 			Expression inner = e.get(0);
-			this.let("char*", backtrack, "ctx->cur");
+			this.let("long", backtrack, "ctx->pos");
 			this.IfFunc(inner, "");
 			this.openBlock();
-			this.let(null, "ctx->cur", backtrack);
+			this.backtrack(backtrack);
 			this.returnVal("0");
 			this.closeBlock();
-			this.let(null, "ctx->cur", backtrack);
+			this.backtrack(backtrack);
 			this.returnVal("1");
 			this.closeBlock();
 			this.file.writeNewLine();
@@ -381,15 +416,15 @@ public class SlowCParserGenerator extends ParserGenerator {
 	public void visitAnd(And e) {
 		if (this.funcDecl("int", "pAnd" + e.getId(), "ParsingContext ctx", e)) {
 			this.openBlock();
-			String backtrack = "c" + this.fid;
+			String backtrack = "pos" + this.fid;
 			Expression inner = e.get(0);
-			this.let("char*", backtrack, "ctx->cur");
+			this.let("long", backtrack, "ctx->pos");
 			this.IfFunc(inner, "");
 			this.openBlock();
-			this.let(null, "ctx->cur", backtrack);
+			this.backtrack(backtrack);
 			this.returnVal("1");
 			this.closeBlock();
-			this.let(null, "ctx->cur", backtrack);
+			this.backtrack(backtrack);
 			this.returnVal("0");
 			this.closeBlock();
 			this.file.writeNewLine();
@@ -401,14 +436,14 @@ public class SlowCParserGenerator extends ParserGenerator {
 	public void visitOption(Option e) {
 		if (this.funcDecl("int", "pOption" + e.getId(), "ParsingContext ctx", e)) {
 			this.openBlock();
-			String backtrack = "c" + this.fid;
+			String backtrack = "pos" + this.fid;
 			Expression inner = e.get(0);
-			this.let("char*", backtrack, "ctx->cur");
+			this.let("long", backtrack, "ctx->pos");
 			this.IfFunc(inner, "");
 			this.openBlock();
 			this.returnVal("1");
 			this.closeBlock();
-			this.let(null, "ctx->cur", backtrack);
+			this.backtrack(backtrack);
 			this.returnVal("1");
 			this.closeBlock();
 			e.get(0).visit(this);
@@ -419,18 +454,19 @@ public class SlowCParserGenerator extends ParserGenerator {
 	public void visitRepetition(Repetition e) {
 		if (this.funcDecl("int", "pZeroMore" + e.getId(), "ParsingContext ctx", e)) {
 			this.openBlock();
-			String backtrack = "c" + this.fid;
+			String backtrack = "pos" + this.fid;
 			Expression inner = e.get(0);
-			this.let("char*", backtrack, "ctx->cur");
-			this.file.writeIndent("while(1)");
-			this.openBlock();
+			this.let("long", backtrack, "ctx->pos");
+//			this.file.writeIndent("while(1)");
+//			this.openBlock();
 			this.IfFunc(inner, "!");
 			this.openBlock();
-			this.let(null, "ctx->cur", backtrack);
+			this.backtrack(backtrack);
 			this.returnVal("1");
 			this.closeBlock();
-			this.let(null, backtrack, "ctx->cur");
-			this.closeBlock();
+			this.file.writeIndent("if(ctx->pos == " + backtrack + ") { return 1; }");
+			this.returnVal("pZeroMore" + e.getId() + "(ctx)");
+//			this.closeBlock();
 			this.closeBlock();
 			this.file.writeNewLine();
 			inner.visit(this);
@@ -441,21 +477,22 @@ public class SlowCParserGenerator extends ParserGenerator {
 	public void visitRepetition1(Repetition1 e) {
 		if (this.funcDecl("int", "pOneMore" + e.getId(), "ParsingContext ctx", e)) {
 			this.openBlock();
-			String backtrack = "c" + this.fid;
+			String backtrack = "pos" + this.fid;
 			Expression inner = e.get(0);
 			this.IfFunc(inner, "!");
 			this.openBlock();
 			this.returnVal("0");
 			this.closeBlock();
-			this.let("char*", backtrack, "ctx->cur");
+			this.let("long", backtrack, "ctx->pos");
 			this.file.writeIndent("while(1)");
 			this.openBlock();
 			this.IfFunc(inner, "!");
 			this.openBlock();
-			this.let(null, "ctx->cur", backtrack);
+			this.backtrack(backtrack);
 			this.returnVal("1");
 			this.closeBlock();
-			this.let(null, backtrack, "ctx->cur");
+			this.file.writeIndent("if(ctx->pos == " + backtrack + ") { return 1; }");
+			this.let(null, backtrack, "ctx->pos");
 			this.closeBlock();
 			this.closeBlock();
 			this.file.writeNewLine();
@@ -467,15 +504,22 @@ public class SlowCParserGenerator extends ParserGenerator {
 	public void visitSequence(Sequence e) {
 		if (this.funcDecl("int", "pSequence" + e.getId(), "ParsingContext ctx", e)) {
 			this.openBlock();
+			this.let("int", "result", "1");
+			this.let("long", "pos", "ctx->pos");
 			for (int i = 0; i < e.size(); i++) {
 				Expression inner = e.get(i);
 				if (this.IfFunc(inner, "!")) {
 					this.openBlock();
+//					this.let(null, "result", "0");
 					this.returnVal("0");
 					this.closeBlock();
 				}
 			}
-			this.returnVal("1");
+//			this.file.writeIndent("if(result == 0)");
+//			this.openBlock();
+//			this.let(null, "ctx->pos", "pos");
+//			this.closeBlock();
+			this.returnVal("result");
 			this.closeBlock();
 			this.file.writeNewLine();
 		}
@@ -489,15 +533,15 @@ public class SlowCParserGenerator extends ParserGenerator {
 		if (this.funcDecl("int", "pChoice" + e.getId(), "ParsingContext ctx", e)) {
 			this.openBlock();
 			this.fid++;
-			String backtrack = "c" + this.fid;
-			this.let("char*", backtrack, "ctx->cur");
+			String backtrack = "pos" + this.fid;
+			this.let("long", backtrack, "ctx->pos");
 			for (int i = 0; i < e.size(); i++) {
 				Expression inner = e.get(i);
 				this.IfFunc(inner, "");
 				this.openBlock();
 				this.returnVal("1");
 				this.closeBlock();
-				this.let(null, "ctx->cur", backtrack);
+				this.backtrack(backtrack);
 			}
 			this.returnVal("0");
 			this.closeBlock();
