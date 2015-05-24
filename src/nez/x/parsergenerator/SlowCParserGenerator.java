@@ -179,11 +179,13 @@ public class SlowCParserGenerator extends ParserGenerator {
 	}
 
 	private void consume() {
-		this.file.writeIndent("nez_consume(ctx);");
+//		this.file.writeIndent("nez_consume(ctx);");
+		this.file.writeIndent("ctx->pos++;");
 	}
 
 	private void backtrack(String pos) {
-		this.file.writeIndent("nez_backtrack(ctx, " + pos + ");");
+		//this.file.writeIndent("nez_backtrack(ctx, " + pos + ");");
+		this.file.writeIndent("ctx->pos =" + pos + ";");
 	}
 
 	private String match(String match) {
@@ -291,10 +293,13 @@ public class SlowCParserGenerator extends ParserGenerator {
 			return ("'\\t'");
 		case '\r':
 			return ("'\\r'");
-		case '\"':
-			return ("\'\\\"\'");
+		case '\'':
+			return ("\'\\\'\'");
 		case '\\':
 			return ("'\\\\'");
+		}
+		if (Character.isISOControl(c) || c > 127) {
+			return String.format("\'\\x%02x\'", (int) c);
 		}
 		return "\'" + c + "\'";
 	}
@@ -367,12 +372,9 @@ public class SlowCParserGenerator extends ParserGenerator {
 			for (int start = 1; start < 256; start++) {
 //				int end = searchEndChar(b, start + 1);
 //				if (start == end) {
-				if (start > 100) {
-					this.If(this.match("(char)" + start));
-				}
-				else {
-					this.If("ctx->inputs[ctx->pos] == " + ("(char)" + start));
-				}
+
+				this.If("ctx->inputs[ctx->pos] == " + ("(char)" + start));
+
 				this.openBlock();
 				this.consume();
 				this.returnVal("1");
