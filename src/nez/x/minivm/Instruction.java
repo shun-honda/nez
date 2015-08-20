@@ -136,7 +136,7 @@ abstract class MatchingInstruction extends Instruction {
 	public MatchingInstruction(Expression expr, int... cdata) {
 		super(expr);
 		this.cdata = new ArrayList<Integer>();
-		for (int element : cdata) {
+		for(int element : cdata) {
 			this.cdata.add(element);
 		}
 	}
@@ -209,7 +209,7 @@ class CHARMAP extends JumpMatchingInstruction {
 	@Override
 	protected void stringfy(StringBuilder sb) {
 		sb.append("  CHARMAP ");
-		for (int i = 0; i < this.size(); i++) {
+		for(int i = 0; i < this.size(); i++) {
 			sb.append(this.getc(i) + " ");
 		}
 		sb.append(this.jump.getBBName());
@@ -219,7 +219,7 @@ class CHARMAP extends JumpMatchingInstruction {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("CHARMAP ");
-		for (int i = 0; i < this.size(); i++) {
+		for(int i = 0; i < this.size(); i++) {
 			sb.append(this.getc(i) + " ");
 		}
 		sb.append(this.jump.codeIndex);
@@ -236,7 +236,7 @@ class STRING extends JumpMatchingInstruction {
 	@Override
 	protected void stringfy(StringBuilder sb) {
 		sb.append("  STRING ");
-		for (int i = 0; i < this.size(); i++) {
+		for(int i = 0; i < this.size(); i++) {
 			sb.append(this.getc(i) + " ");
 		}
 		sb.append("jump:" + this.jump.getBBName());
@@ -246,7 +246,7 @@ class STRING extends JumpMatchingInstruction {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("STRING ");
-		for (int i = 0; i < this.size(); i++) {
+		for(int i = 0; i < this.size(); i++) {
 			sb.append(this.getc(i) + " ");
 		}
 		sb.append(this.jump.codeIndex);
@@ -295,22 +295,22 @@ class PUSHpos extends StackOperateInstruction {
 	}
 }
 
-//class PUSHmark extends StackOperateInstruction {
-//	public PUSHmark(Expression expr) {
-//		super(expr);
-//		this.op = Opcode.PUSHmark;
-//	}
+// class PUSHmark extends StackOperateInstruction {
+// public PUSHmark(Expression expr) {
+// super(expr);
+// this.op = Opcode.PUSHmark;
+// }
 //
-//	@Override
-//	protected void stringfy(StringBuilder sb) {
-//		sb.append("  PUSHmark");
-//	}
+// @Override
+// protected void stringfy(StringBuilder sb) {
+// sb.append(" PUSHmark");
+// }
 //
-//	@Override
-//	public String toString() {
-//		return "PUSHmark";
-//	}
-//}
+// @Override
+// public String toString() {
+// return "PUSHmark";
+// }
+// }
 
 class GETpos extends StackOperateInstruction {
 	public GETpos(Expression expr) {
@@ -399,222 +399,224 @@ class FAIL extends Instruction {
 	}
 }
 
-//class NEW extends Instruction {
-//	public NEW(Expression expr) {
-//		super(expr);
-//		this.op = Opcode.NEW;
-//	}
+// class NEW extends Instruction {
+// public NEW(Expression expr) {
+// super(expr);
+// this.op = Opcode.NEW;
+// }
 //
-//	@Override
-//	protected void stringfy(StringBuilder sb) {
-//		sb.append("  NEW");
-//	}
+// @Override
+// protected void stringfy(StringBuilder sb) {
+// sb.append(" NEW");
+// }
 //
-//	@Override
-//	public String toString() {
-//		return "NEW";
-//	}
-//}
+// @Override
+// public String toString() {
+// return "NEW";
+// }
+// }
 //
-//class LEFTJOIN extends Instruction {
-//	int index;
+// class LEFTJOIN extends Instruction {
+// int index;
 //
-//	public LEFTJOIN(Expression expr, int index) {
-//		super(expr);
-//		this.op = Opcode.LEFTJOIN;
-//		this.index = index;
-//	}
+// public LEFTJOIN(Expression expr, int index) {
+// super(expr);
+// this.op = Opcode.LEFTJOIN;
+// this.index = index;
+// }
 //
-//	@Override
-//	protected void stringfy(StringBuilder sb) {
-//		sb.append("  LEFTJOIN ");
-//		sb.append(this.index);
-//	}
+// @Override
+// protected void stringfy(StringBuilder sb) {
+// sb.append(" LEFTJOIN ");
+// sb.append(this.index);
+// }
 //
-//	@Override
-//	public String toString() {
-//		return "LEFTJOIN " + this.index;
-//	}
-//}
+// @Override
+// public String toString() {
+// return "LEFTJOIN " + this.index;
+// }
+// }
 //
-//class COMMIT extends Instruction {
-//	int index;
+// class COMMIT extends Instruction {
+// int index;
 //
-//	public COMMIT(Expression expr, int index) {
-//		super(expr);
-//		this.op = Opcode.COMMIT;
-//		this.index = index;
-//	}
+// public COMMIT(Expression expr, int index) {
+// super(expr);
+// this.op = Opcode.COMMIT;
+// this.index = index;
+// }
 //
-//	@Override
-//	protected void stringfy(StringBuilder sb) {
-//		sb.append("  COMMIT ");
-//		sb.append(this.index);
-//	}
+// @Override
+// protected void stringfy(StringBuilder sb) {
+// sb.append(" COMMIT ");
+// sb.append(this.index);
+// }
 //
-//	@Override
-//	public String toString() {
-//		return "COMMIT " + this.index;
-//	}
-//}
+// @Override
+// public String toString() {
+// return "COMMIT " + this.index;
+// }
+// }
 //
-//class ABORT extends Instruction {
-//	public ABORT(Expression expr) {
-//		super(expr);
-//		this.op = Opcode.ABORT;
-//	}
+// class ABORT extends Instruction {
+// public ABORT(Expression expr) {
+// super(expr);
+// this.op = Opcode.ABORT;
+// }
 //
-//	@Override
-//	protected void stringfy(StringBuilder sb) {
-//		sb.append("  ABORT");
-//	}
+// @Override
+// protected void stringfy(StringBuilder sb) {
+// sb.append(" ABORT");
+// }
 //
-//	@Override
-//	public String toString() {
-//		return "ABORT";
-//	}
-//}
+// @Override
+// public String toString() {
+// return "ABORT";
+// }
+// }
 //
-//class CAPTURE extends Instruction {
-//	public CAPTURE(Expression expr) {
-//		super(expr);
-//		this.op = Opcode.CAPTURE;
-//	}
+// class CAPTURE extends Instruction {
+// public CAPTURE(Expression expr) {
+// super(expr);
+// this.op = Opcode.CAPTURE;
+// }
 //
-//	@Override
-//	protected void stringfy(StringBuilder sb) {
-//		sb.append("  CAPTURE");
-//	}
+// @Override
+// protected void stringfy(StringBuilder sb) {
+// sb.append(" CAPTURE");
+// }
 //
-//	@Override
-//	public String toString() {
-//		return "CAPTURE";
-//	}
-//}
+// @Override
+// public String toString() {
+// return "CAPTURE";
+// }
+// }
 //
-//class TAG extends Instruction {
-//	String cdata;
+// class TAG extends Instruction {
+// String cdata;
 //
-//	public TAG(Expression expr, String cdata) {
-//		super(expr);
-//		this.op = Opcode.TAG;
-//		this.cdata = cdata;
-//	}
+// public TAG(Expression expr, String cdata) {
+// super(expr);
+// this.op = Opcode.TAG;
+// this.cdata = cdata;
+// }
 //
-//	@Override
-//	protected void stringfy(StringBuilder sb) {
-//		sb.append("  TAG ");
-//		sb.append(this.cdata);
-//	}
+// @Override
+// protected void stringfy(StringBuilder sb) {
+// sb.append(" TAG ");
+// sb.append(this.cdata);
+// }
 //
-//	@Override
-//	public String toString() {
-//		return "TAG " + this.cdata;
-//	}
-//}
+// @Override
+// public String toString() {
+// return "TAG " + this.cdata;
+// }
+// }
 //
-//class VALUE extends Instruction {
-//	String cdata;
+// class VALUE extends Instruction {
+// String cdata;
 //
-//	public VALUE(Expression expr, String cdata) {
-//		super(expr);
-//		this.op = Opcode.VALUE;
-//		this.cdata = cdata;
-//	}
+// public VALUE(Expression expr, String cdata) {
+// super(expr);
+// this.op = Opcode.VALUE;
+// this.cdata = cdata;
+// }
 //
-//	@Override
-//	protected void stringfy(StringBuilder sb) {
-//		sb.append("  VALUE ");
-//		sb.append(this.cdata);
-//	}
+// @Override
+// protected void stringfy(StringBuilder sb) {
+// sb.append(" VALUE ");
+// sb.append(this.cdata);
+// }
 //
-//	@Override
-//	public String toString() {
-//		return "VALUE " + this.cdata;
-//	}
-//}
+// @Override
+// public String toString() {
+// return "VALUE " + this.cdata;
+// }
+// }
 
-//class MEMOIZE extends Instruction {
-//	int memoPoint;
+// class MEMOIZE extends Instruction {
+// int memoPoint;
 //
-//	public MEMOIZE(Expression expr, int memoPoint) {
-//		super(expr);
-//		this.op = Opcode.MEMOIZE;
-//		this.memoPoint = memoPoint;
-//	}
+// public MEMOIZE(Expression expr, int memoPoint) {
+// super(expr);
+// this.op = Opcode.MEMOIZE;
+// this.memoPoint = memoPoint;
+// }
 //
-//	@Override
-//	protected void stringfy(StringBuilder sb) {
-//		sb.append("  MEMOIZE " + this.memoPoint);
-//	}
+// @Override
+// protected void stringfy(StringBuilder sb) {
+// sb.append(" MEMOIZE " + this.memoPoint);
+// }
 //
-//	@Override
-//	public String toString() {
-//		return "MEMOIZE " + this.memoPoint;
-//	}
-//}
+// @Override
+// public String toString() {
+// return "MEMOIZE " + this.memoPoint;
+// }
+// }
 //
-//class LOOKUP extends JumpInstruction {
-//	int memoPoint;
+// class LOOKUP extends JumpInstruction {
+// int memoPoint;
 //
-//	public LOOKUP(Expression expr, BasicBlock jump, int memoPoint) {
-//		super(expr, jump);
-//		this.op = Opcode.LOOKUP;
-//		this.memoPoint = memoPoint;
-//	}
+// public LOOKUP(Expression expr, BasicBlock jump, int memoPoint) {
+// super(expr, jump);
+// this.op = Opcode.LOOKUP;
+// this.memoPoint = memoPoint;
+// }
 //
-//	@Override
-//	protected void stringfy(StringBuilder sb) {
-//		sb.append("  LOOKUP " + this.memoPoint);
-//	}
+// @Override
+// protected void stringfy(StringBuilder sb) {
+// sb.append(" LOOKUP " + this.memoPoint);
+// }
 //
-//	@Override
-//	public String toString() {
-//		return "LOOKUP " + this.memoPoint + " " + this.jump.codeIndex;
-//	}
-//}
+// @Override
+// public String toString() {
+// return "LOOKUP " + this.memoPoint + " " + this.jump.codeIndex;
+// }
+// }
 //
-//class MEMOIZENODE extends Instruction {
-//	int memoPoint;
+// class MEMOIZENODE extends Instruction {
+// int memoPoint;
 //
-//	public MEMOIZENODE(Expression expr, int memoPoint) {
-//		super(expr);
-//		this.op = Opcode.MEMOIZENODE;
-//		this.memoPoint = memoPoint;
-//	}
+// public MEMOIZENODE(Expression expr, int memoPoint) {
+// super(expr);
+// this.op = Opcode.MEMOIZENODE;
+// this.memoPoint = memoPoint;
+// }
 //
-//	@Override
-//	protected void stringfy(StringBuilder sb) {
-//		sb.append("  MEMOIZENODE " + this.memoPoint);
-//	}
+// @Override
+// protected void stringfy(StringBuilder sb) {
+// sb.append(" MEMOIZENODE " + this.memoPoint);
+// }
 //
-//	@Override
-//	public String toString() {
-//		return "MEMOIZENODE " + this.memoPoint;
-//	}
-//}
+// @Override
+// public String toString() {
+// return "MEMOIZENODE " + this.memoPoint;
+// }
+// }
 //
-//class LOOKUPNODE extends JumpInstruction {
-//	int memoPoint;
-//	int index;
+// class LOOKUPNODE extends JumpInstruction {
+// int memoPoint;
+// int index;
 //
-//	public LOOKUPNODE(Expression expr, BasicBlock jump, int memoPoint, int index) {
-//		super(expr, jump);
-//		this.op = Opcode.LOOKUPNODE;
-//		this.memoPoint = memoPoint;
-//		this.index = index;
-//	}
+// public LOOKUPNODE(Expression expr, BasicBlock jump, int memoPoint, int index)
+// {
+// super(expr, jump);
+// this.op = Opcode.LOOKUPNODE;
+// this.memoPoint = memoPoint;
+// this.index = index;
+// }
 //
-//	@Override
-//	protected void stringfy(StringBuilder sb) {
-//		sb.append("  LOOKUPNODE " + this.memoPoint + " " + this.index);
-//	}
+// @Override
+// protected void stringfy(StringBuilder sb) {
+// sb.append(" LOOKUPNODE " + this.memoPoint + " " + this.index);
+// }
 //
-//	@Override
-//	public String toString() {
-//		return "LOOKUPNODE " + this.memoPoint + " " + this.index + " " + this.jump.codeIndex;
-//	}
-//}
+// @Override
+// public String toString() {
+// return "LOOKUPNODE " + this.memoPoint + " " + this.index + " " +
+// this.jump.codeIndex;
+// }
+// }
 
 class NOTCHAR extends JumpMatchingInstruction {
 	public NOTCHAR(Expression expr, BasicBlock jump, int... cdata) {
@@ -635,33 +637,6 @@ class NOTCHAR extends JumpMatchingInstruction {
 	}
 }
 
-class NOTCHARMAP extends JumpMatchingInstruction {
-	public NOTCHARMAP(Expression expr, BasicBlock jump) {
-		super(expr, jump);
-		this.op = Opcode.NOTCHARMAP;
-	}
-
-	@Override
-	protected void stringfy(StringBuilder sb) {
-		sb.append("  NOTCHARMAP ");
-		for (int i = 0; i < this.size(); i++) {
-			sb.append(this.getc(i) + " ");
-		}
-		sb.append(this.jump.getBBName());
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("NOTCHARMAP ");
-		for (int i = 0; i < this.size(); i++) {
-			sb.append(this.getc(i) + " ");
-		}
-		sb.append(this.jump.codeIndex);
-		return sb.toString();
-	}
-}
-
 class NOTSTRING extends JumpMatchingInstruction {
 	public NOTSTRING(Expression expr, BasicBlock jump) {
 		super(expr, jump);
@@ -671,7 +646,7 @@ class NOTSTRING extends JumpMatchingInstruction {
 	@Override
 	protected void stringfy(StringBuilder sb) {
 		sb.append("  NOTSTRING ");
-		for (int i = 0; i < this.size(); i++) {
+		for(int i = 0; i < this.size(); i++) {
 			sb.append(this.getc(i) + " ");
 		}
 		sb.append(this.jump.getBBName());
@@ -681,29 +656,11 @@ class NOTSTRING extends JumpMatchingInstruction {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("NOTSTRING ");
-		for (int i = 0; i < this.size(); i++) {
+		for(int i = 0; i < this.size(); i++) {
 			sb.append(this.getc(i) + " ");
 		}
 		sb.append(this.jump.codeIndex);
 		return sb.toString();
-	}
-}
-
-class OPTIONALCHAR extends MatchingInstruction {
-	public OPTIONALCHAR(Expression expr, int... cdata) {
-		super(expr, cdata);
-		this.op = Opcode.OPTIONALCHAR;
-	}
-
-	@Override
-	protected void stringfy(StringBuilder sb) {
-		sb.append("  OPTIONALCHAR ");
-		sb.append(this.getc(0));
-	}
-
-	@Override
-	public String toString() {
-		return "OPTIONALCHAR " + this.getc(0);
 	}
 }
 
@@ -716,7 +673,7 @@ class OPTIONALCHARMAP extends MatchingInstruction {
 	@Override
 	protected void stringfy(StringBuilder sb) {
 		sb.append("  OPTIONALCHARMAP ");
-		for (int i = 0; i < this.size(); i++) {
+		for(int i = 0; i < this.size(); i++) {
 			sb.append(this.getc(i) + " ");
 		}
 	}
@@ -725,32 +682,7 @@ class OPTIONALCHARMAP extends MatchingInstruction {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("OPTIONALCHARMAP ");
-		for (int i = 0; i < this.size(); i++) {
-			sb.append(this.getc(i) + " ");
-		}
-		return sb.toString();
-	}
-}
-
-class OPTIONALSTRING extends MatchingInstruction {
-	public OPTIONALSTRING(Expression expr) {
-		super(expr);
-		this.op = Opcode.OPTIONALSTRING;
-	}
-
-	@Override
-	protected void stringfy(StringBuilder sb) {
-		sb.append("  OPTIONALSTRING ");
-		for (int i = 0; i < this.size(); i++) {
-			sb.append(this.getc(i) + " ");
-		}
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("OPTIONALSTRING ");
-		for (int i = 0; i < this.size(); i++) {
+		for(int i = 0; i < this.size(); i++) {
 			sb.append(this.getc(i) + " ");
 		}
 		return sb.toString();
@@ -766,7 +698,7 @@ class ZEROMORECHARMAP extends MatchingInstruction {
 	@Override
 	protected void stringfy(StringBuilder sb) {
 		sb.append("  ZEROMORECHARMAP ");
-		for (int i = 0; i < this.size(); i++) {
+		for(int i = 0; i < this.size(); i++) {
 			sb.append(this.getc(i) + " ");
 		}
 	}
@@ -775,7 +707,7 @@ class ZEROMORECHARMAP extends MatchingInstruction {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("ZEROMORECHARMAP ");
-		for (int i = 0; i < this.size(); i++) {
+		for(int i = 0; i < this.size(); i++) {
 			sb.append(this.getc(i) + " ");
 		}
 		return sb.toString();

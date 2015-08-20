@@ -53,7 +53,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 		this.peg = peg;
 		this.module = new Module();
 		this.option = new OptimizerOption();
-		switch (level) {
+		switch(level) {
 		case 1:
 			this.option.setFlowAnalysis(true);
 			break;
@@ -101,14 +101,14 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 		// GrammerfileName (n byte)
 		byte[] name = grammerfileName.getBytes();
-		for (int i = 0; i < fileNamelen; i++) {
+		for(int i = 0; i < fileNamelen; i++) {
 			byteCode[pos] = name[i];
 			pos++;
 		}
 
 		// pool_size_info
-//		int poolSizeInfo = 1064;
-//		pos = write32(byteCode, poolSizeInfo, pos);
+		// int poolSizeInfo = 1064;
+		// pos = write32(byteCode, poolSizeInfo, pos);
 
 		// rule table
 		int ruleSize = this.callTable.size();
@@ -122,22 +122,22 @@ public class MiniVMCompiler extends GrammarVisitor {
 		int strTableSize = this.strTable.size();
 		pos = write32(byteCode, strTableSize, pos);
 
-//		for (int i = 0; i < this.module.size(); i++) {
-//			Function func = this.module.get(i);
-//			byte[] ruleName = func.funcName.getBytes();
-//			int ruleNamelen = ruleName.length;
-//			long entryPoint = func.get(0).codeIndex;
-//			pos = write32(byteCode, ruleNamelen, pos);
-//			for (byte element : ruleName) {
-//				byteCode[pos] = element;
-//				pos++;
-//			}
-//			pos = write64(byteCode, entryPoint, pos);
-//		}
+		// for (int i = 0; i < this.module.size(); i++) {
+		// Function func = this.module.get(i);
+		// byte[] ruleName = func.funcName.getBytes();
+		// int ruleNamelen = ruleName.length;
+		// long entryPoint = func.get(0).codeIndex;
+		// pos = write32(byteCode, ruleNamelen, pos);
+		// for (byte element : ruleName) {
+		// byteCode[pos] = element;
+		// pos++;
+		// }
+		// pos = write64(byteCode, entryPoint, pos);
+		// }
 
 		// memo table size (use memo hash)
-//		int memoTableSize = this.memoMap.size();
-//		pos = write32(byteCode, memoTableSize, pos);
+		// int memoTableSize = this.memoMap.size();
+		// pos = write32(byteCode, memoTableSize, pos);
 
 		// Length of byte code (8 byte)
 		long byteCodelength = this.codeIndex;
@@ -145,11 +145,11 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 		int index = 0;
 		// byte code (m byte)
-		for (int i = 0; i < this.module.size(); i++) {
+		for(int i = 0; i < this.module.size(); i++) {
 			Function func = this.module.get(i);
-			for (int j = 0; j < func.size(); j++) {
+			for(int j = 0; j < func.size(); j++) {
 				BasicBlock bb = func.get(j);
-				for (int k = 0; k < bb.size(); k++) {
+				for(int k = 0; k < bb.size(); k++) {
 					Instruction inst = bb.get(k);
 					pos = writeOpcode(inst, byteCode, pos, index);
 					index++;
@@ -160,12 +160,12 @@ public class MiniVMCompiler extends GrammarVisitor {
 		System.out.println("bytecode size: " + pos + "[byte]");
 
 		try {
-			if (outputFileName == null) {
+			if(outputFileName == null) {
 				System.out.println("unspecified outputfile");
 				System.exit(0);
 			}
 			FileOutputStream fos = new FileOutputStream(outputFileName);
-			for (int i = 0; i < pos; i++) {
+			for(int i = 0; i < pos; i++) {
 				fos.write(byteCode[i]);
 			}
 			fos.flush();
@@ -213,7 +213,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 		int j = 0;
 		pos = write16(byteCode, cdata.length(), pos);
 		byte[] nameByte = cdata.getBytes();
-		while (j < cdata.length()) {
+		while(j < cdata.length()) {
 			byteCode[pos] = nameByte[j];
 			j++;
 			pos++;
@@ -224,31 +224,33 @@ public class MiniVMCompiler extends GrammarVisitor {
 	private int writeOpcode(Instruction code, byte[] byteCode, int pos, int index) {
 		byteCode[pos] = (byte) code.op.ordinal();
 		pos++;
-		switch (code.op) {
+		switch(code.op) {
 		case jump:
-//			byteCode[pos++] = (byte) (((JUMP) code).jump.codeIndex - index);
+			// byteCode[pos++] = (byte) (((JUMP) code).jump.codeIndex - index);
 			pos = write16(byteCode, ((JUMP) code).jump.codeIndex - index, pos);
 			break;
 		case call:
 			CALL call = (CALL) code;
 			int n = this.callTable.indexOf(call);
-			//System.out.println(n);
+			// System.out.println(n);
 			byteCode[pos++] = (byte) n;
 			pos = write32(byteCode, call.jumpIndex - index, pos);
 			break;
 		case IFFAIL:
-//			pos = write32(byteCode, ((JumpInstruction) code).jump.codeIndex - index, pos);
+			// pos = write32(byteCode, ((JumpInstruction) code).jump.codeIndex -
+			// index, pos);
 			pos = write16(byteCode, ((JumpInstruction) code).jump.codeIndex - index, pos);
 			break;
 		case CHAR:
 			pos = writeByte(byteCode, (byte) ((CHAR) code).getc(0), pos);
-//			pos = write32(byteCode, ((CHAR) code).jump.codeIndex - index, pos);
+			// pos = write32(byteCode, ((CHAR) code).jump.codeIndex - index,
+			// pos);
 			break;
 		case CHARMAP:
 			pos = writeByte(byteCode, (byte) this.charMapTable.indexOf((MatchingInstruction) code), pos);
 			CHARMAP charset = (CHARMAP) code;
 			pos = write16(byteCode, charset.size(), pos);
-			for (int j = 0; j < charset.size(); j++) {
+			for(int j = 0; j < charset.size(); j++) {
 				pos = writeByte(byteCode, (byte) charset.getc(j), pos);
 			}
 			pos = write32(byteCode, charset.jump.codeIndex - index, pos);
@@ -256,74 +258,55 @@ public class MiniVMCompiler extends GrammarVisitor {
 		case STRING:
 			pos = writeByte(byteCode, (byte) this.strTable.indexOf((MatchingInstruction) code), pos);
 			pos = write16(byteCode, ((STRING) code).size(), pos);
-			for (int j = 0; j < ((STRING) code).size(); j++) {
+			for(int j = 0; j < ((STRING) code).size(); j++) {
 				pos = writeByte(byteCode, (byte) ((STRING) code).getc(j), pos);
 			}
 			pos = write32(byteCode, ((STRING) code).jump.codeIndex - index, pos);
 			break;
 		case ANY:
-//			pos = write32(byteCode, ((ANY) code).jump.codeIndex - index, pos);
+			// pos = write32(byteCode, ((ANY) code).jump.codeIndex - index,
+			// pos);
 			break;
-//		case LEFTJOIN:
-//			pos = write32(byteCode, ((LEFTJOIN) code).index, pos);
-//			break;
-//		case COMMIT:
-//			pos = write32(byteCode, ((COMMIT) code).index, pos);
-//			break;
-//		case TAG:
-//			pos = writeCdataByteCode(byteCode, ((TAG) code).cdata, pos);
-//			break;
-//		case VALUE:
-//			pos = writeCdataByteCode(byteCode, ((VALUE) code).cdata, pos);
-//			break;
+		// case LEFTJOIN:
+		// pos = write32(byteCode, ((LEFTJOIN) code).index, pos);
+		// break;
+		// case COMMIT:
+		// pos = write32(byteCode, ((COMMIT) code).index, pos);
+		// break;
+		// case TAG:
+		// pos = writeCdataByteCode(byteCode, ((TAG) code).cdata, pos);
+		// break;
+		// case VALUE:
+		// pos = writeCdataByteCode(byteCode, ((VALUE) code).cdata, pos);
+		// break;
 		case NOTCHAR:
 			pos = writeByte(byteCode, (byte) this.strTable.indexOf((MatchingInstruction) code), pos);
 			NOTCHAR nc = (NOTCHAR) code;
 			pos = writeByte(byteCode, (byte) nc.getc(0), pos);
 			pos = write32(byteCode, nc.jump.codeIndex - index, pos);
 			break;
-		case NOTCHARMAP:
-			pos = writeByte(byteCode, (byte) this.charMapTable.indexOf((MatchingInstruction) code), pos);
-			NOTCHARMAP ncs = (NOTCHARMAP) code;
-			pos = write16(byteCode, ncs.size(), pos);
-			for (int j = 0; j < ncs.size(); j++) {
-				pos = writeByte(byteCode, (byte) ncs.getc(j), pos);
-			}
-			pos = write32(byteCode, ncs.jump.codeIndex - index, pos);
-			break;
 		case NOTSTRING:
 			pos = writeByte(byteCode, (byte) this.strTable.indexOf((MatchingInstruction) code), pos);
 			NOTSTRING ns = (NOTSTRING) code;
 			pos = write16(byteCode, ns.size(), pos);
-			for (int j = 0; j < ns.size(); j++) {
+			for(int j = 0; j < ns.size(); j++) {
 				pos = writeByte(byteCode, (byte) ns.getc(j), pos);
 			}
 			pos = write32(byteCode, ns.jump.codeIndex - index, pos);
-			break;
-		case OPTIONALCHAR:
-			pos = writeByte(byteCode, (byte) ((OPTIONALCHAR) code).getc(0), pos);
 			break;
 		case OPTIONALCHARMAP:
 			pos = writeByte(byteCode, (byte) this.charMapTable.indexOf((MatchingInstruction) code), pos);
 			OPTIONALCHARMAP ocs = (OPTIONALCHARMAP) code;
 			pos = write16(byteCode, ocs.size(), pos);
-			for (int j = 0; j < ocs.size(); j++) {
+			for(int j = 0; j < ocs.size(); j++) {
 				pos = writeByte(byteCode, (byte) ocs.getc(j), pos);
-			}
-			break;
-		case OPTIONALSTRING:
-			pos = writeByte(byteCode, (byte) this.strTable.indexOf((MatchingInstruction) code), pos);
-			OPTIONALSTRING os = (OPTIONALSTRING) code;
-			pos = write16(byteCode, os.size(), pos);
-			for (int j = 0; j < os.size(); j++) {
-				pos = writeByte(byteCode, (byte) os.getc(j), pos);
 			}
 			break;
 		case ZEROMORECHARMAP:
 			pos = writeByte(byteCode, (byte) this.charMapTable.indexOf((MatchingInstruction) code), pos);
 			ZEROMORECHARMAP zcs = (ZEROMORECHARMAP) code;
 			pos = write16(byteCode, zcs.size(), pos);
-			for (int j = 0; j < zcs.size(); j++) {
+			for(int j = 0; j < zcs.size(); j++) {
 				pos = writeByte(byteCode, (byte) zcs.getc(j), pos);
 			}
 			break;
@@ -399,8 +382,8 @@ public class MiniVMCompiler extends GrammarVisitor {
 		// writeCode(Instruction.EXIT);
 		Function func = new Function(this.module, "EXIT");
 		this.inliningMap.put(func.funcName, false);
-		if (this.option.useInlining) {
-			for (Rule rule : this.peg.getRuleList()) {
+		if(this.option.useInlining) {
+			for(Rule rule : this.peg.getRuleList()) {
 				this.inliningMap.put(rule.getLocalName(), false);
 			}
 		}
@@ -411,16 +394,15 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	public void formatFooter() {
 		System.out.println(this.module.stringfy(this.sb));
-		if (this.option.useFlowAnalysis) {
+		if(this.option.useFlowAnalysis) {
 			this.optimizer.optimize();
 		}
-		if (this.option.useInlining) {
+		if(this.option.useInlining) {
 			int i = 0;
-			while (i < this.module.size()) {
-				if (this.inliningMap.get(this.module.get(i).funcName)) {
+			while(i < this.module.size()) {
+				if(this.inliningMap.get(this.module.get(i).funcName)) {
 					this.module.remove(i);
-				}
-				else {
+				} else {
 					i++;
 				}
 			}
@@ -436,32 +418,31 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	private void labeling() {
 		int codeIndex = 0;
-		for (int i = 0; i < this.module.size(); i++) {
+		for(int i = 0; i < this.module.size(); i++) {
 			Function func = this.module.get(i);
 			this.callMap.put(func.funcName, codeIndex);
-			for (int j = 0; j < func.size(); j++) {
+			for(int j = 0; j < func.size(); j++) {
 				BasicBlock bb = func.get(j);
 				bb.codeIndex = codeIndex;
 				codeIndex += bb.size();
 			}
 		}
 		this.codeIndex = codeIndex;
-		for (int i = 0; i < this.module.size(); i++) {
+		for(int i = 0; i < this.module.size(); i++) {
 			Function func = this.module.get(i);
-			for (int j = 0; j < func.size(); j++) {
+			for(int j = 0; j < func.size(); j++) {
 				BasicBlock bb = func.get(j);
-				for (int k = 0; k < bb.size(); k++) {
+				for(int k = 0; k < bb.size(); k++) {
 					Instruction inst = bb.get(k);
-					if (inst instanceof CALL) {
+					if(inst instanceof CALL) {
 						CALL cinst = (CALL) inst;
 						cinst.jumpIndex = this.callMap.get(cinst.ruleName);
 						this.callTable.add(cinst);
-					}
-					else if (inst instanceof STRING || inst instanceof NOTSTRING || inst instanceof OPTIONALSTRING || inst instanceof NOTCHAR) {
+					} else if(inst instanceof STRING || inst instanceof NOTSTRING || inst instanceof NOTCHAR) {
 						MatchingInstruction si = (MatchingInstruction) inst;
 						this.strTable.add(si);
-					}
-					else if (inst instanceof CHARMAP || inst instanceof NOTCHARMAP || inst instanceof OPTIONALCHARMAP || inst instanceof ZEROMORECHARMAP) {
+					} else if(inst instanceof CHARMAP || inst instanceof OPTIONALCHARMAP
+							|| inst instanceof ZEROMORECHARMAP) {
 						MatchingInstruction si = (MatchingInstruction) inst;
 						this.charMapTable.add(si);
 					}
@@ -472,11 +453,11 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	private void dumpLastestCode() {
 		int codeIndex = 0;
-		for (int i = 0; i < this.module.size(); i++) {
+		for(int i = 0; i < this.module.size(); i++) {
 			Function func = this.module.get(i);
-			for (int j = 0; j < func.size(); j++) {
+			for(int j = 0; j < func.size(); j++) {
 				BasicBlock bb = func.get(j);
-				for (int k = 0; k < bb.size(); k++) {
+				for(int k = 0; k < bb.size(); k++) {
 					Instruction inst = bb.get(k);
 					System.out.println("[" + codeIndex + "] " + inst.toString());
 					codeIndex++;
@@ -486,9 +467,9 @@ public class MiniVMCompiler extends GrammarVisitor {
 	}
 
 	private boolean checkCharMap(Choice e) {
-		for (int i = 0; i < e.size(); i++) {
+		for(int i = 0; i < e.size(); i++) {
 			Expression inner = e.get(i);
-			if (!(inner instanceof ByteChar) && !(inner instanceof ByteMap)) {
+			if(!(inner instanceof ByteChar) && !(inner instanceof ByteMap)) {
 				return false;
 			}
 		}
@@ -496,8 +477,8 @@ public class MiniVMCompiler extends GrammarVisitor {
 	}
 
 	private boolean checkString(Sequence e) {
-		for (int i = 0; i < e.size(); i++) {
-			if (!(e.get(i) instanceof ByteChar)) {
+		for(int i = 0; i < e.size(); i++) {
+			if(!(e.get(i) instanceof ByteChar)) {
 				return false;
 			}
 		}
@@ -508,15 +489,14 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	private int checkWriteChoiceCharset(Choice e, int index, BasicBlock bb, BasicBlock fbb, boolean UnaryChoice) {
 		int charCount = 0;
-		for (int i = index; i < e.size(); i++) {
-			if (e.get(i) instanceof ByteChar || e.get(i) instanceof ByteMap) {
+		for(int i = index; i < e.size(); i++) {
+			if(e.get(i) instanceof ByteChar || e.get(i) instanceof ByteMap) {
 				charCount++;
-			}
-			else {
+			} else {
 				break;
 			}
 		}
-		if (charCount <= 1) {
+		if(charCount <= 1) {
 			fbb = new BasicBlock();
 			this.pushFailureJumpPoint(fbb);
 			e.get(index).visit(this);
@@ -524,7 +504,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 			this.currentFailBB = fbb;
 			return index++;
 		}
-		if (charCount != e.size()) {
+		if(charCount != e.size()) {
 			backTrackFlag = true;
 			fbb = new BasicBlock();
 			this.currentFailBB = fbb;
@@ -536,21 +516,20 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	private final int writeSequenceCode(Expression e, int index, int size) {
 		int count = 0;
-		for (int i = index; i < size; i++) {
-			if (e.get(i) instanceof ByteChar) {
+		for(int i = index; i < size; i++) {
+			if(e.get(i) instanceof ByteChar) {
 				count++;
-			}
-			else {
+			} else {
 				break;
 			}
 		}
-		if (count <= 1) {
+		if(count <= 1) {
 			e.get(index).visit(this);
 			return index++;
 		}
 		STRING str = (STRING) this.builder.createSTRING(e, this.jumpFailureJump());
-//		this.builder.createIFFAIL(e, this.jumpFailureJump());
-		for (int i = index; i < index + count; i++) {
+		// this.builder.createIFFAIL(e, this.jumpFailureJump());
+		for(int i = index; i < index + count; i++) {
 			str.append(((ByteChar) e.get(i)).byteChar);
 		}
 		return index + count - 1;
@@ -561,26 +540,24 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	private boolean checkSC(Expression e) {
 		int depth = this.depth;
-		if (e instanceof NonTerminal) {
+		if(e instanceof NonTerminal) {
 			e = getNonTerminalRule(e);
 		}
-		if (e instanceof Unary) {
-			if (this.depth++ < 2) {
-				if (this.option.useFusionInstruction) {
-					if (e instanceof Not) {
-						if (checkOptNot((Not) e)) {
+		if(e instanceof Unary) {
+			if(this.depth++ < 2) {
+				if(this.option.useFusionInstruction) {
+					if(e instanceof Not) {
+						if(checkOptNot((Not) e)) {
 							this.depth = depth;
 							return true;
 						}
-					}
-					else if (e instanceof Repetition) {
-						if (checkOptRepetition((Repetition) e)) {
+					} else if(e instanceof Repetition) {
+						if(checkOptRepetition((Repetition) e)) {
 							this.depth = depth;
 							return true;
 						}
-					}
-					else if (e instanceof Option) {
-						if (checkOptOptional((Option) e)) {
+					} else if(e instanceof Option) {
+						if(checkOptOptional((Option) e)) {
 							this.depth = depth;
 							return true;
 						}
@@ -593,10 +570,10 @@ public class MiniVMCompiler extends GrammarVisitor {
 			this.depth = depth;
 			return false;
 		}
-		if (e instanceof Sequence || e instanceof Choice || e instanceof New) {
-			if (depth < 2) {
-				for (int i = 0; i < e.size(); i++) {
-					if (!checkSC(e.get(i))) {
+		if(e instanceof Sequence || e instanceof Choice || e instanceof New) {
+			if(depth < 2) {
+				for(int i = 0; i < e.size(); i++) {
+					if(!checkSC(e.get(i))) {
 						return false;
 					}
 				}
@@ -609,13 +586,13 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	private boolean checkOptRepetition(Repetition e) {
 		Expression inner = e.get(0);
-		if (inner instanceof NonTerminal) {
+		if(inner instanceof NonTerminal) {
 			inner = getNonTerminalRule(inner);
 		}
-		if (inner instanceof ByteMap) {
+		if(inner instanceof ByteMap) {
 			return true;
 		}
-		if (inner instanceof Choice) {
+		if(inner instanceof Choice) {
 			return checkCharMap((Choice) inner);
 		}
 		return false;
@@ -623,22 +600,22 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	private boolean checkOptNot(Not e) {
 		Expression inner = e.get(0);
-		if (inner instanceof NonTerminal) {
+		if(inner instanceof NonTerminal) {
 			inner = getNonTerminalRule(inner);
 		}
-		if (inner instanceof ByteChar) {
+		if(inner instanceof ByteChar) {
 			return true;
 		}
-		if (inner instanceof ByteMap) {
+		if(inner instanceof ByteMap) {
 			return true;
 		}
-		if (inner instanceof AnyChar) {
+		if(inner instanceof AnyChar) {
 			return true;
 		}
-		if (inner instanceof Choice) {
+		if(inner instanceof Choice) {
 			return checkCharMap((Choice) inner);
 		}
-		if (inner instanceof Sequence) {
+		if(inner instanceof Sequence) {
 			return checkString((Sequence) inner);
 		}
 		return false;
@@ -646,19 +623,19 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	private boolean checkOptOptional(Option e) {
 		Expression inner = e.get(0);
-		if (inner instanceof NonTerminal) {
+		if(inner instanceof NonTerminal) {
 			inner = getNonTerminalRule(inner);
 		}
-		if (inner instanceof ByteChar) {
+		if(inner instanceof ByteChar) {
 			return true;
 		}
-		if (inner instanceof ByteMap) {
+		if(inner instanceof ByteMap) {
 			return true;
 		}
-		if (inner instanceof Choice) {
+		if(inner instanceof Choice) {
 			return checkCharMap((Choice) inner);
 		}
-		if (inner instanceof Sequence) {
+		if(inner instanceof Sequence) {
 			return checkString((Sequence) inner);
 		}
 		return false;
@@ -666,33 +643,31 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	private void writeCharsetCode(Expression e, int index, int charCount) {
 		CHARMAP inst = (CHARMAP) this.builder.createCHARMAP(e, this.jumpFailureJump());
-//		this.builder.createIFFAIL(e, this.jumpFailureJump());
-		for (int i = index; i < index + charCount; i++) {
-			if (e.get(i) instanceof ByteChar) {
+		// this.builder.createIFFAIL(e, this.jumpFailureJump());
+		for(int i = index; i < index + charCount; i++) {
+			if(e.get(i) instanceof ByteChar) {
 				inst.append(((ByteChar) e.get(i)).byteChar);
-			}
-			else if (e.get(i) instanceof ByteMap) {
+			} else if(e.get(i) instanceof ByteMap) {
 				ByteMap br = (ByteMap) e.get(i);
-				for (int c = 0; c < 256; c++) {
-					if (br.byteMap[c]) {
+				for(int c = 0; c < 256; c++) {
+					if(br.byteMap[c]) {
 						inst.append(c);
 					}
 				}
-			}
-			else {
+			} else {
 				System.out.println("Error: Not Char Content in Charset");
 			}
 		}
 	}
 
 	private void optimizeChoice(Choice e) {
-		if (this.checkCharMap(e)) {
+		if(this.checkCharMap(e)) {
 			writeCharsetCode(e, 0, e.size());
 		}
 	}
 
 	private Expression getNonTerminalRule(Expression e) {
-		while (e instanceof NonTerminal) {
+		while(e instanceof NonTerminal) {
 			NonTerminal nterm = (NonTerminal) e;
 			e = nterm.deReference();
 		}
@@ -700,13 +675,13 @@ public class MiniVMCompiler extends GrammarVisitor {
 	}
 
 	private void writeNotCode(Not e) {
-		if (this.option.useFlowAnalysis) {
-			if (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.ChoiceNot)) {
+		if(this.option.useFlowAnalysis) {
+			if(this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.ChoiceNot)) {
 				BasicBlock fbb = new BasicBlock();
 				this.pushFailureJumpPoint(fbb);
-//				this.builder.createPUSHpos(e);
+				// this.builder.createPUSHpos(e);
 				e.get(0).visit(this);
-				if (this.lastChoiceElementIsUnary) {
+				if(this.lastChoiceElementIsUnary) {
 					this.builder.createSTOREpos(e);
 					this.builder.createFAIL(e);
 					this.builder.createJUMP(e, this.jumpPrevFailureJump());
@@ -716,8 +691,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 					this.builder.createGETpos(e);
 					this.builder.createSUCC(e);
 					return;
-				}
-				else {
+				} else {
 					this.builder.createGETpos(e);
 					this.builder.createJUMP(e, this.jumpPrevFailureJump());
 					this.popFailureJumpPoint(e);
@@ -743,114 +717,114 @@ public class MiniVMCompiler extends GrammarVisitor {
 		this.builder.createSUCC(e);
 	}
 
-//	private void writeSCNotCode(Not e) {
-//		if (this.depth == 0) {
-//			BasicBlock fbb = new BasicBlock();
-//			this.pushFailureJumpPoint(fbb);
-//			this.builder.createLOADp1(e);
-//			this.depth++;
-//			e.get(0).visit(this);
-//			this.depth--;
-//			this.builder.createSTOREp1(e);
-//			this.builder.createSTOREflag(e, 1);
-//			this.builder.createJUMP(e, this.jumpPrevFailureJump());
-//			this.popFailureJumpPoint(e);
-//			this.setInsertPoint(fbb);
-//			this.builder.setCurrentBB(fbb);
-//			this.builder.createSTOREp1(e);
-//			this.builder.createSTOREflag(e, 0);
-//		} else if (depth == 1) {
-//			BasicBlock fbb = new BasicBlock();
-//			this.pushFailureJumpPoint(fbb);
-//			this.builder.createLOADp2(e);
-//			this.depth++;
-//			e.get(0).visit(this);
-//			this.depth--;
-//			this.builder.createSTOREp2(e);
-//			this.builder.createSTOREflag(e, 1);
-//			this.builder.createJUMP(e, this.jumpPrevFailureJump());
-//			this.popFailureJumpPoint(e);
-//			this.setInsertPoint(fbb);
-//			this.builder.setCurrentBB(fbb);
-//			this.builder.createSTOREp2(e);
-//			this.builder.createSTOREflag(e, 0);
-//		} else {
-//			BasicBlock fbb = new BasicBlock();
-//			this.pushFailureJumpPoint(fbb);
-//			this.builder.createLOADp3(e);
-//			this.depth++;
-//			e.get(0).visit(this);
-//			this.depth--;
-//			this.builder.createSTOREp3(e);
-//			this.builder.createSTOREflag(e, 1);
-//			this.builder.createJUMP(e, this.jumpPrevFailureJump());
-//			this.popFailureJumpPoint(e);
-//			this.setInsertPoint(fbb);
-//			this.builder.setCurrentBB(fbb);
-//			this.builder.createSTOREp3(e);
-//			this.builder.createSTOREflag(e, 0);
-//		}
-//	}
+	// private void writeSCNotCode(Not e) {
+	// if (this.depth == 0) {
+	// BasicBlock fbb = new BasicBlock();
+	// this.pushFailureJumpPoint(fbb);
+	// this.builder.createLOADp1(e);
+	// this.depth++;
+	// e.get(0).visit(this);
+	// this.depth--;
+	// this.builder.createSTOREp1(e);
+	// this.builder.createSTOREflag(e, 1);
+	// this.builder.createJUMP(e, this.jumpPrevFailureJump());
+	// this.popFailureJumpPoint(e);
+	// this.setInsertPoint(fbb);
+	// this.builder.setCurrentBB(fbb);
+	// this.builder.createSTOREp1(e);
+	// this.builder.createSTOREflag(e, 0);
+	// } else if (depth == 1) {
+	// BasicBlock fbb = new BasicBlock();
+	// this.pushFailureJumpPoint(fbb);
+	// this.builder.createLOADp2(e);
+	// this.depth++;
+	// e.get(0).visit(this);
+	// this.depth--;
+	// this.builder.createSTOREp2(e);
+	// this.builder.createSTOREflag(e, 1);
+	// this.builder.createJUMP(e, this.jumpPrevFailureJump());
+	// this.popFailureJumpPoint(e);
+	// this.setInsertPoint(fbb);
+	// this.builder.setCurrentBB(fbb);
+	// this.builder.createSTOREp2(e);
+	// this.builder.createSTOREflag(e, 0);
+	// } else {
+	// BasicBlock fbb = new BasicBlock();
+	// this.pushFailureJumpPoint(fbb);
+	// this.builder.createLOADp3(e);
+	// this.depth++;
+	// e.get(0).visit(this);
+	// this.depth--;
+	// this.builder.createSTOREp3(e);
+	// this.builder.createSTOREflag(e, 1);
+	// this.builder.createJUMP(e, this.jumpPrevFailureJump());
+	// this.popFailureJumpPoint(e);
+	// this.setInsertPoint(fbb);
+	// this.builder.setCurrentBB(fbb);
+	// this.builder.createSTOREp3(e);
+	// this.builder.createSTOREflag(e, 0);
+	// }
+	// }
 
-	private void writeNotCharMapCode(Choice e) {
-		NOTCHARMAP inst = (NOTCHARMAP) this.builder.createNOTCHARMAP(e, this.jumpFailureJump());
-		for (int i = 0; i < e.size(); i++) {
-			if (e.get(i) instanceof ByteChar) {
-				inst.append(((ByteChar) e.get(i)).byteChar);
-			}
-			else if (e.get(i) instanceof ByteMap) {
-				ByteMap br = (ByteMap) e.get(i);
-				for (int c = 0; c < 256; c++) {
-					if (br.byteMap[c]) {
-						inst.append(c);
-					}
-				}
-			}
-			else {
-				System.out.println("Error: Not Char Content in Charset");
-			}
-		}
-	}
+	// private void writeNotCharMapCode(Choice e) {
+	// NOTCHARMAP inst = (NOTCHARMAP) this.builder.createNOTCHARMAP(e,
+	// this.jumpFailureJump());
+	// for(int i = 0; i < e.size(); i++) {
+	// if(e.get(i) instanceof ByteChar) {
+	// inst.append(((ByteChar) e.get(i)).byteChar);
+	// } else if(e.get(i) instanceof ByteMap) {
+	// ByteMap br = (ByteMap) e.get(i);
+	// for(int c = 0; c < 256; c++) {
+	// if(br.byteMap[c]) {
+	// inst.append(c);
+	// }
+	// }
+	// } else {
+	// System.out.println("Error: Not Char Content in Charset");
+	// }
+	// }
+	// }
 
 	private void writeNotStringCode(Sequence e) {
 		NOTSTRING inst = (NOTSTRING) this.builder.createNOTSTRING(e, this.jumpFailureJump());
-		for (int i = 0; i < e.size(); i++) {
+		for(int i = 0; i < e.size(); i++) {
 			inst.append(((ByteChar) e.get(i)).byteChar);
 		}
 	}
 
 	private boolean optimizeNot(Not e) {
 		Expression inner = e.get(0);
-		if (inner instanceof NonTerminal) {
+		if(inner instanceof NonTerminal) {
 			inner = getNonTerminalRule(inner);
 		}
-		if (inner instanceof ByteChar) {
+		if(inner instanceof ByteChar) {
 			this.builder.createNOTCHAR(inner, this.jumpFailureJump(), ((ByteChar) inner).byteChar);
-//			this.builder.createIFFAIL(inner, this.jumpFailureJump());
+			// this.builder.createIFFAIL(inner, this.jumpFailureJump());
 			return true;
 		}
-		if (inner instanceof ByteMap) {
-			ByteMap br = (ByteMap) inner;
-			NOTCHARMAP inst = (NOTCHARMAP) this.builder.createNOTCHARMAP(inner, this.jumpFailureJump());
-			for (int c = 0; c < 256; c++) {
-				if (br.byteMap[c]) {
-					inst.append(c);
-				}
-			}
-//			this.builder.createIFFAIL(inner, this.jumpFailureJump());
-			return true;
-		}
-		if (inner instanceof Choice) {
-			if (checkCharMap((Choice) inner)) {
-				writeNotCharMapCode((Choice) inner);
-//				this.builder.createIFFAIL(inner, this.jumpFailureJump());
-				return true;
-			}
-		}
-		if (inner instanceof Sequence) {
-			if (checkString((Sequence) inner)) {
+		// if(inner instanceof ByteMap) {
+		// ByteMap br = (ByteMap) inner;
+		// NOTCHARMAP inst = (NOTCHARMAP) this.builder.createNOTCHARMAP(inner,
+		// this.jumpFailureJump());
+		// for(int c = 0; c < 256; c++) {
+		// if(br.byteMap[c]) {
+		// inst.append(c);
+		// }
+		// }
+		// // this.builder.createIFFAIL(inner, this.jumpFailureJump());
+		// return true;
+		// }
+		// if(inner instanceof Choice) {
+		// if(checkCharMap((Choice) inner)) {
+		// writeNotCharMapCode((Choice) inner);
+		// // this.builder.createIFFAIL(inner, this.jumpFailureJump());
+		// return true;
+		// }
+		// }
+		if(inner instanceof Sequence) {
+			if(checkString((Sequence) inner)) {
 				writeNotStringCode((Sequence) inner);
-//				this.builder.createIFFAIL(inner, this.jumpFailureJump());
+				// this.builder.createIFFAIL(inner, this.jumpFailureJump());
 				return true;
 			}
 		}
@@ -858,13 +832,13 @@ public class MiniVMCompiler extends GrammarVisitor {
 	}
 
 	private void writeOptionalCode(Option e) {
-		if (this.option.useFlowAnalysis) {
-			if (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.ChoiceOption)) {
+		if(this.option.useFlowAnalysis) {
+			if(this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.ChoiceOption)) {
 				BasicBlock fbb = new BasicBlock();
 				BasicBlock mergebb = new BasicBlock();
 				this.pushFailureJumpPoint(fbb);
 				e.get(0).visit(this);
-				if (this.lastChoiceElementIsUnary) {
+				if(this.lastChoiceElementIsUnary) {
 					this.builder.createJUMP(e, mergebb);
 					this.popFailureJumpPoint(e);
 					this.setInsertPoint(fbb);
@@ -872,8 +846,7 @@ public class MiniVMCompiler extends GrammarVisitor {
 					this.builder.createGETpos(e);
 					this.builder.setCurrentBB(mergebb);
 					this.setInsertPoint(mergebb);
-				}
-				else {
+				} else {
 					this.builder.createJUMP(e, mergebb);
 					this.popFailureJumpPoint(e);
 					this.setInsertPoint(fbb);
@@ -900,53 +873,53 @@ public class MiniVMCompiler extends GrammarVisitor {
 		this.setInsertPoint(mergebb);
 	}
 
-//	private void writeSCOptionalCode(Option e) {
-//		BasicBlock fbb = new BasicBlock();
-//		BasicBlock mergebb = new BasicBlock();
-//		this.pushFailureJumpPoint(fbb);
-//		if (this.depth == 0) {
-//			this.builder.createLOADp1(e);
-//			this.depth++;
-//			e.get(0).visit(this);
-//			this.depth--;
-//			this.builder.createJUMP(e, mergebb);
-//			this.popFailureJumpPoint(e);
-//			this.setInsertPoint(fbb);
-//			this.builder.createSTOREflag(e, 0);
-//			this.builder.createSTOREp1(e);
-//			this.builder.setCurrentBB(mergebb);
-//			this.setInsertPoint(mergebb);
-//		} else if (this.depth == 1) {
-//			this.builder.createLOADp2(e);
-//			this.depth++;
-//			e.get(0).visit(this);
-//			this.depth--;
-//			this.builder.createJUMP(e, mergebb);
-//			this.popFailureJumpPoint(e);
-//			this.setInsertPoint(fbb);
-//			this.builder.createSTOREflag(e, 0);
-//			this.builder.createSTOREp2(e);
-//			this.builder.setCurrentBB(mergebb);
-//			this.setInsertPoint(mergebb);
-//		} else {
-//			this.builder.createLOADp3(e);
-//			this.depth++;
-//			e.get(0).visit(this);
-//			this.depth--;
-//			this.builder.createJUMP(e, mergebb);
-//			this.popFailureJumpPoint(e);
-//			this.setInsertPoint(fbb);
-//			this.builder.createSTOREflag(e, 0);
-//			this.builder.createSTOREp3(e);
-//			this.builder.setCurrentBB(mergebb);
-//			this.setInsertPoint(mergebb);
-//		}
-//	}
+	// private void writeSCOptionalCode(Option e) {
+	// BasicBlock fbb = new BasicBlock();
+	// BasicBlock mergebb = new BasicBlock();
+	// this.pushFailureJumpPoint(fbb);
+	// if (this.depth == 0) {
+	// this.builder.createLOADp1(e);
+	// this.depth++;
+	// e.get(0).visit(this);
+	// this.depth--;
+	// this.builder.createJUMP(e, mergebb);
+	// this.popFailureJumpPoint(e);
+	// this.setInsertPoint(fbb);
+	// this.builder.createSTOREflag(e, 0);
+	// this.builder.createSTOREp1(e);
+	// this.builder.setCurrentBB(mergebb);
+	// this.setInsertPoint(mergebb);
+	// } else if (this.depth == 1) {
+	// this.builder.createLOADp2(e);
+	// this.depth++;
+	// e.get(0).visit(this);
+	// this.depth--;
+	// this.builder.createJUMP(e, mergebb);
+	// this.popFailureJumpPoint(e);
+	// this.setInsertPoint(fbb);
+	// this.builder.createSTOREflag(e, 0);
+	// this.builder.createSTOREp2(e);
+	// this.builder.setCurrentBB(mergebb);
+	// this.setInsertPoint(mergebb);
+	// } else {
+	// this.builder.createLOADp3(e);
+	// this.depth++;
+	// e.get(0).visit(this);
+	// this.depth--;
+	// this.builder.createJUMP(e, mergebb);
+	// this.popFailureJumpPoint(e);
+	// this.setInsertPoint(fbb);
+	// this.builder.createSTOREflag(e, 0);
+	// this.builder.createSTOREp3(e);
+	// this.builder.setCurrentBB(mergebb);
+	// this.setInsertPoint(mergebb);
+	// }
+	// }
 
 	private void writeOptionalByteMapCode(ByteMap e) {
 		OPTIONALCHARMAP inst = (OPTIONALCHARMAP) this.builder.createOPTIONALCHARMAP(e);
-		for (int c = 0; c < 256; c++) {
-			if (e.byteMap[c]) {
+		for(int c = 0; c < 256; c++) {
+			if(e.byteMap[c]) {
 				inst.append(c);
 			}
 		}
@@ -954,89 +927,90 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	private void writeOptionalCharMapCode(Choice e) {
 		OPTIONALCHARMAP inst = (OPTIONALCHARMAP) this.builder.createOPTIONALCHARMAP(e);
-		for (int i = 0; i < e.size(); i++) {
-			if (e.get(i) instanceof ByteChar) {
+		for(int i = 0; i < e.size(); i++) {
+			if(e.get(i) instanceof ByteChar) {
 				inst.append(((ByteChar) e.get(i)).byteChar);
-			}
-			else if (e.get(i) instanceof ByteMap) {
+			} else if(e.get(i) instanceof ByteMap) {
 				ByteMap br = (ByteMap) e.get(i);
-				for (int c = 0; c < 256; c++) {
-					if (br.byteMap[c]) {
+				for(int c = 0; c < 256; c++) {
+					if(br.byteMap[c]) {
 						inst.append(c);
 					}
 				}
-			}
-			else {
+			} else {
 				System.out.println("Error: Not Char Content in Charset");
 			}
 		}
 	}
 
-	private void writeOptionalStringCode(Sequence e) {
-		OPTIONALSTRING inst = (OPTIONALSTRING) this.builder.createOPTIONALSTRING(e);
-		for (int i = 0; i < e.size(); i++) {
-			inst.append(((ByteChar) e.get(i)).byteChar);
-		}
-	}
+	// private void writeOptionalStringCode(Sequence e) {
+	// OPTIONALSTRING inst = (OPTIONALSTRING)
+	// this.builder.createOPTIONALSTRING(e);
+	// for(int i = 0; i < e.size(); i++) {
+	// inst.append(((ByteChar) e.get(i)).byteChar);
+	// }
+	// }
 
 	private boolean optimizeOptional(Option e) {
 		Expression inner = e.get(0);
-		if (inner instanceof NonTerminal) {
+		if(inner instanceof NonTerminal) {
 			inner = getNonTerminalRule(inner);
 		}
-		if (inner instanceof ByteChar) {
-			this.builder.createOPTIONALCHAR(inner, ((ByteChar) inner).byteChar);
-			return true;
-		}
-		if (inner instanceof ByteMap) {
+		// if(inner instanceof ByteChar) {
+		// this.builder.createOPTIONALCHAR(inner, ((ByteChar) inner).byteChar);
+		// return true;
+		// }
+		if(inner instanceof ByteMap) {
 			writeOptionalByteMapCode((ByteMap) inner);
 			return true;
 		}
-		if (inner instanceof Choice) {
-			if (checkCharMap((Choice) inner)) {
+		if(inner instanceof Choice) {
+			if(checkCharMap((Choice) inner)) {
 				writeOptionalCharMapCode((Choice) inner);
 				return true;
 			}
 		}
-		if (inner instanceof Sequence) {
-			if (checkString((Sequence) inner)) {
-				writeOptionalStringCode((Sequence) inner);
-				return true;
-			}
-		}
+		// if(inner instanceof Sequence) {
+		// if(checkString((Sequence) inner)) {
+		// writeOptionalStringCode((Sequence) inner);
+		// return true;
+		// }
+		// }
 		return false;
 	}
 
 	private void writeRepetitionCode(Repetition e) {
-//		if (this.option.useFlowAnalysis) {
-//			if (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.ChoiceRepetition)) {
-//				BasicBlock bb = new BasicBlock(this.func);
-//				BasicBlock fbb = new BasicBlock();
-//				BasicBlock mergebb = new BasicBlock();
-//				this.pushFailureJumpPoint(fbb);
-//				this.builder.setCurrentBB(bb);
-//				e.get(0).visit(this);
-//				if (this.lastChoiceElementIsUnary) {
-//					this.builder.createJUMP(e, bb);
-//					this.popFailureJumpPoint(e);
-//					this.setInsertPoint(fbb);
-//					this.builder.createSTOREflag(e, 0);
-//					this.builder.createSTOREpos(e);
-//					this.setInsertPoint(mergebb);
-//					this.builder.setCurrentBB(mergebb);
-//				}
-//				else {
-//					this.builder.createJUMP(e, bb);
-//					this.popFailureJumpPoint(e);
-//					this.setInsertPoint(fbb);
-//					this.builder.createSTOREflag(e, 0);
-//					this.builder.createGETpos(e);
-//					this.setInsertPoint(mergebb);
-//					this.builder.setCurrentBB(mergebb);
-//				}
-//				return;
-//			}
-//		}
+		// if (this.option.useFlowAnalysis) {
+		// if
+		// (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.ChoiceRepetition))
+		// {
+		// BasicBlock bb = new BasicBlock(this.func);
+		// BasicBlock fbb = new BasicBlock();
+		// BasicBlock mergebb = new BasicBlock();
+		// this.pushFailureJumpPoint(fbb);
+		// this.builder.setCurrentBB(bb);
+		// e.get(0).visit(this);
+		// if (this.lastChoiceElementIsUnary) {
+		// this.builder.createJUMP(e, bb);
+		// this.popFailureJumpPoint(e);
+		// this.setInsertPoint(fbb);
+		// this.builder.createSTOREflag(e, 0);
+		// this.builder.createSTOREpos(e);
+		// this.setInsertPoint(mergebb);
+		// this.builder.setCurrentBB(mergebb);
+		// }
+		// else {
+		// this.builder.createJUMP(e, bb);
+		// this.popFailureJumpPoint(e);
+		// this.setInsertPoint(fbb);
+		// this.builder.createSTOREflag(e, 0);
+		// this.builder.createGETpos(e);
+		// this.setInsertPoint(mergebb);
+		// this.builder.setCurrentBB(mergebb);
+		// }
+		// return;
+		// }
+		// }
 		BasicBlock bb = new BasicBlock(this.func);
 		BasicBlock fbb = new BasicBlock();
 		BasicBlock mergebb = new BasicBlock();
@@ -1054,54 +1028,54 @@ public class MiniVMCompiler extends GrammarVisitor {
 		this.builder.setCurrentBB(mergebb);
 	}
 
-//	private void writeSCRepetitionCode(Repetition e) {
-//		BasicBlock bb = new BasicBlock(this.func);
-//		BasicBlock fbb = new BasicBlock();
-//		BasicBlock mergebb = new BasicBlock();
-//		this.pushFailureJumpPoint(fbb);
-//		this.builder.setCurrentBB(bb);
-//		if (this.depth == 0) {
-//			this.builder.createLOADp1(e);
-//			this.depth++;
-//			e.get(0).visit(this);
-//			this.depth--;
-//			this.builder.createJUMP(e, bb);
-//			this.popFailureJumpPoint(e);
-//			this.setInsertPoint(fbb);
-//			this.builder.createSTOREflag(e, 0);
-//			this.builder.createSTOREp1(e);
-//			this.setInsertPoint(mergebb);
-//			this.builder.setCurrentBB(mergebb);
-//		} else if (this.depth == 1) {
-//			this.builder.createLOADp2(e);
-//			this.depth++;
-//			e.get(0).visit(this);
-//			this.depth--;
-//			this.builder.createJUMP(e, bb);
-//			this.popFailureJumpPoint(e);
-//			this.setInsertPoint(fbb);
-//			this.builder.createSTOREflag(e, 0);
-//			this.builder.createSTOREp2(e);
-//			this.setInsertPoint(mergebb);
-//			this.builder.setCurrentBB(mergebb);
-//		} else {
-//			this.builder.createLOADp3(e);
-//			this.depth++;
-//			e.get(0).visit(this);
-//			this.depth--;
-//			this.builder.createJUMP(e, bb);
-//			this.popFailureJumpPoint(e);
-//			this.setInsertPoint(fbb);
-//			this.builder.createSTOREflag(e, 0);
-//			this.builder.createSTOREp3(e);
-//			this.setInsertPoint(mergebb);
-//			this.builder.setCurrentBB(mergebb);
-//		}
-//	}
+	// private void writeSCRepetitionCode(Repetition e) {
+	// BasicBlock bb = new BasicBlock(this.func);
+	// BasicBlock fbb = new BasicBlock();
+	// BasicBlock mergebb = new BasicBlock();
+	// this.pushFailureJumpPoint(fbb);
+	// this.builder.setCurrentBB(bb);
+	// if (this.depth == 0) {
+	// this.builder.createLOADp1(e);
+	// this.depth++;
+	// e.get(0).visit(this);
+	// this.depth--;
+	// this.builder.createJUMP(e, bb);
+	// this.popFailureJumpPoint(e);
+	// this.setInsertPoint(fbb);
+	// this.builder.createSTOREflag(e, 0);
+	// this.builder.createSTOREp1(e);
+	// this.setInsertPoint(mergebb);
+	// this.builder.setCurrentBB(mergebb);
+	// } else if (this.depth == 1) {
+	// this.builder.createLOADp2(e);
+	// this.depth++;
+	// e.get(0).visit(this);
+	// this.depth--;
+	// this.builder.createJUMP(e, bb);
+	// this.popFailureJumpPoint(e);
+	// this.setInsertPoint(fbb);
+	// this.builder.createSTOREflag(e, 0);
+	// this.builder.createSTOREp2(e);
+	// this.setInsertPoint(mergebb);
+	// this.builder.setCurrentBB(mergebb);
+	// } else {
+	// this.builder.createLOADp3(e);
+	// this.depth++;
+	// e.get(0).visit(this);
+	// this.depth--;
+	// this.builder.createJUMP(e, bb);
+	// this.popFailureJumpPoint(e);
+	// this.setInsertPoint(fbb);
+	// this.builder.createSTOREflag(e, 0);
+	// this.builder.createSTOREp3(e);
+	// this.setInsertPoint(mergebb);
+	// this.builder.setCurrentBB(mergebb);
+	// }
+	// }
 
 	private void writeZeroMoreByteMapCode(ByteMap e, ZEROMORECHARMAP inst) {
-		for (int c = 0; c < 256; c++) {
-			if (e.byteMap[c]) {
+		for(int c = 0; c < 256; c++) {
+			if(e.byteMap[c]) {
 				inst.append(c);
 			}
 		}
@@ -1114,15 +1088,13 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	private void writeZeroMoreCharsetCode(Choice e) {
 		ZEROMORECHARMAP inst = (ZEROMORECHARMAP) this.builder.createZEROMORECHARMAP(e);
-		for (int i = 0; i < e.size(); i++) {
-			if (e.get(i) instanceof ByteChar) {
+		for(int i = 0; i < e.size(); i++) {
+			if(e.get(i) instanceof ByteChar) {
 				inst.append(((ByteChar) e.get(i)).byteChar);
-			}
-			else if (e.get(i) instanceof ByteMap) {
+			} else if(e.get(i) instanceof ByteMap) {
 				ByteMap br = (ByteMap) e.get(i);
 				writeZeroMoreByteMapCode(br, inst);
-			}
-			else {
+			} else {
 				System.out.println("Error: Not Char Content in Charset");
 			}
 		}
@@ -1130,15 +1102,15 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	private boolean optimizeRepetition(Repetition e) {
 		Expression inner = e.get(0);
-		if (inner instanceof NonTerminal) {
+		if(inner instanceof NonTerminal) {
 			inner = getNonTerminalRule(inner);
 		}
-		if (inner instanceof ByteMap) {
+		if(inner instanceof ByteMap) {
 			writeZeroMoreByteMapCode((ByteMap) inner);
 			return true;
 		}
-		if (inner instanceof Choice) {
-			if (checkCharMap((Choice) inner)) {
+		if(inner instanceof Choice) {
+			if(checkCharMap((Choice) inner)) {
 				writeZeroMoreCharsetCode((Choice) inner);
 				return true;
 			}
@@ -1146,19 +1118,19 @@ public class MiniVMCompiler extends GrammarVisitor {
 		return false;
 	}
 
-//	MemoPoint issueMemoPoint(String label, Expression e) {
-//		if (this.PackratParsing) {
-//			Integer key = e.getId();
-//			assert (e.getId() != 0);
-//			MemoPoint m = this.memoMap.get(key);
-//			if (m == null) {
-//				m = new MemoPoint(this.memoMap.size(), label, e, false);
-//				this.memoMap.put(key, m);
-//			}
-//			return m;
-//		}
-//		return null;
-//	}
+	// MemoPoint issueMemoPoint(String label, Expression e) {
+	// if (this.PackratParsing) {
+	// Integer key = e.getId();
+	// assert (e.getId() != 0);
+	// MemoPoint m = this.memoMap.get(key);
+	// if (m == null) {
+	// m = new MemoPoint(this.memoMap.size(), label, e, false);
+	// this.memoMap.put(key, m);
+	// }
+	// return m;
+	// }
+	// return null;
+	// }
 
 	public void visitRule(Rule e) {
 		this.func = new Function(this.module, e.getLocalName());
@@ -1174,22 +1146,21 @@ public class MiniVMCompiler extends GrammarVisitor {
 	int ruleSize;
 
 	public void visitNonTerminal(NonTerminal e) {
-		if (inlining) {
+		if(inlining) {
 			return;
 		}
-		if (this.option.useInlining) {
+		if(this.option.useInlining) {
 			RuleReferences r = this.analyzer.ruleAnalysisMap.get(e.getLocalName());
 			BasicBlock currentBB = this.builder.getCurrentBB();
-			if (r != null) {
-				if (r.rc == 1) {
+			if(r != null) {
+				if(r.rc == 1) {
 					this.inliningMap.put(e.getLocalName(), true);
 					Expression ne = getNonTerminalRule(e);
 					this.builder.setCurrentBB(new BasicBlock(this.func));
 					ne.visit(this);
 					return;
 				}
-			}
-			else {
+			} else {
 				Expression ne = getNonTerminalRule(e);
 				int index = this.func.size();
 				this.ruleSize = this.func.instSize();
@@ -1197,13 +1168,12 @@ public class MiniVMCompiler extends GrammarVisitor {
 				this.builder.setCurrentBB(new BasicBlock(func));
 				ne.visit(this);
 				this.inlining = false;
-				if (this.func.instSize() - this.ruleSize > 1) {
+				if(this.func.instSize() - this.ruleSize > 1) {
 					int size = this.func.size();
-					for (int i = index; i < size; i++) {
+					for(int i = index; i < size; i++) {
 						this.func.remove(index);
 					}
-				}
-				else {
+				} else {
 					return;
 				}
 			}
@@ -1215,26 +1185,25 @@ public class MiniVMCompiler extends GrammarVisitor {
 			this.builder.createIFFAIL(e, this.jumpFailureJump());
 			BasicBlock bb = new BasicBlock(this.func);
 			this.builder.setCurrentBB(bb);
-		}
-		else {
+		} else {
 			BasicBlock rbb = new BasicBlock();
-//			Rule r = e.getRule();
-//			if (this.PackratParsing) {
-//				if (this.PatternMatching || r.isPurePEG()) {
-//					Expression ref = Factory.resolveNonTerminal(r.getExpression());
-//					MemoPoint m = this.issueMemoPoint(r.getUniqueName(), ref);
-//					if (m != null) {
-//						this.builder.createLOOKUP(e, rbb, m.id);
-//					}
-//					this.builder.createCALL(e, e.ruleName);
-//					this.builder.createMEMOIZE(e, m.id);
-//					this.setInsertPoint(rbb);
-//					this.builder.createIFFAIL(e, this.jumpFailureJump());
-//					BasicBlock bb = new BasicBlock(this.func);
-//					this.builder.setCurrentBB(bb);
-//					return;
-//				}
-//			}
+			// Rule r = e.getRule();
+			// if (this.PackratParsing) {
+			// if (this.PatternMatching || r.isPurePEG()) {
+			// Expression ref = Factory.resolveNonTerminal(r.getExpression());
+			// MemoPoint m = this.issueMemoPoint(r.getUniqueName(), ref);
+			// if (m != null) {
+			// this.builder.createLOOKUP(e, rbb, m.id);
+			// }
+			// this.builder.createCALL(e, e.ruleName);
+			// this.builder.createMEMOIZE(e, m.id);
+			// this.setInsertPoint(rbb);
+			// this.builder.createIFFAIL(e, this.jumpFailureJump());
+			// BasicBlock bb = new BasicBlock(this.func);
+			// this.builder.setCurrentBB(bb);
+			// return;
+			// }
+			// }
 			this.builder.createCALL(e, e.ruleName);
 			this.setInsertPoint(rbb);
 			this.builder.createIFFAIL(e, this.jumpFailureJump());
@@ -1256,33 +1225,32 @@ public class MiniVMCompiler extends GrammarVisitor {
 	}
 
 	public void visitByteMap(ByteMap e) {
-		if (this.option.useFusionInstruction) {
+		if(this.option.useFusionInstruction) {
 			CHARMAP inst = (CHARMAP) this.builder.createCHARMAP(e, this.jumpFailureJump());
-			for (int c = 0; c < 256; c++) {
-				if (e.byteMap[c]) {
+			for(int c = 0; c < 256; c++) {
+				if(e.byteMap[c]) {
 					inst.append(c);
 				}
 			}
-//			this.builder.createIFFAIL(e, this.jumpFailureJump());
-		}
-		else {
+			// this.builder.createIFFAIL(e, this.jumpFailureJump());
+		} else {
 			BasicBlock fbb = null;
 			BasicBlock endbb = new BasicBlock();
 			BasicBlock mergebb = new BasicBlock();
 			int max = 0;
-			for (int i = 0; i < 256; i++) {
-				if (e.byteMap[i]) {
+			for(int i = 0; i < 256; i++) {
+				if(e.byteMap[i]) {
 					max = i;
 				}
 			}
-			for (int i = 0; i <= max; i++) {
-				if (e.byteMap[i]) {
+			for(int i = 0; i <= max; i++) {
+				if(e.byteMap[i]) {
 					fbb = new BasicBlock();
 					this.builder.createCHAR(e, fbb, i);
 					this.builder.createIFFAIL(e, fbb);
 					this.builder.createJUMP(e, endbb);
 					this.setInsertPoint(fbb);
-					if (i != max) {
+					if(i != max) {
 						this.builder.createSUCC(e);
 					}
 					this.builder.setCurrentBB(fbb);
@@ -1300,27 +1268,27 @@ public class MiniVMCompiler extends GrammarVisitor {
 	}
 
 	public void visitNot(Not e) {
-		if (this.option.useFusionInstruction) {
-			if (!optimizeNot(e)) {
-//				if (this.option.useStackCaching && checkSC(e.get(0))) {
-//					writeSCNotCode(e);
-//					return;
-//				}
+		if(this.option.useFusionInstruction) {
+			if(!optimizeNot(e)) {
+				// if (this.option.useStackCaching && checkSC(e.get(0))) {
+				// writeSCNotCode(e);
+				// return;
+				// }
 				writeNotCode(e);
 			}
 		}
-//		else if (this.option.useStackCaching && checkSC(e.get(0))) {
-//			writeSCNotCode(e);
-//			return;
-//		}
+		// else if (this.option.useStackCaching && checkSC(e.get(0))) {
+		// writeSCNotCode(e);
+		// return;
+		// }
 		else {
 			writeNotCode(e);
 		}
 	}
 
 	public void visitAnd(And e) {
-		if (this.option.useFlowAnalysis) {
-			if (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.ChoiceAnd)) {
+		if(this.option.useFlowAnalysis) {
+			if(this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.ChoiceAnd)) {
 				BasicBlock fbb = new BasicBlock();
 				this.pushFailureJumpPoint(fbb);
 				this.builder.createPUSHpos(e);
@@ -1345,38 +1313,38 @@ public class MiniVMCompiler extends GrammarVisitor {
 	}
 
 	public void visitOption(Option e) {
-		if (this.option.useFusionInstruction) {
-			if (!optimizeOptional(e)) {
-//				if (this.option.useStackCaching && checkSC(e.get(0))) {
-//					writeSCOptionalCode(e);
-//					return;
-//				}
+		if(this.option.useFusionInstruction) {
+			if(!optimizeOptional(e)) {
+				// if (this.option.useStackCaching && checkSC(e.get(0))) {
+				// writeSCOptionalCode(e);
+				// return;
+				// }
 				writeOptionalCode(e);
 			}
 		}
-//		else if (this.option.useStackCaching && checkSC(e.get(0))) {
-//			writeSCOptionalCode(e);
-//			return;
-//		}
+		// else if (this.option.useStackCaching && checkSC(e.get(0))) {
+		// writeSCOptionalCode(e);
+		// return;
+		// }
 		else {
 			writeOptionalCode(e);
 		}
 	}
 
 	public void visitRepetition(Repetition e) {
-		if (this.option.useFusionInstruction) {
-			if (!optimizeRepetition(e)) {
-//				if (this.option.useStackCaching && checkSC(e.get(0))) {
-//					writeSCRepetitionCode(e);
-//					return;
-//				}
+		if(this.option.useFusionInstruction) {
+			if(!optimizeRepetition(e)) {
+				// if (this.option.useStackCaching && checkSC(e.get(0))) {
+				// writeSCRepetitionCode(e);
+				// return;
+				// }
 				writeRepetitionCode(e);
 			}
 		}
-//		else if (this.option.useStackCaching && checkSC(e.get(0))) {
-//			writeSCRepetitionCode(e);
-//			return;
-//		}
+		// else if (this.option.useStackCaching && checkSC(e.get(0))) {
+		// writeSCRepetitionCode(e);
+		// return;
+		// }
 		else {
 			writeRepetitionCode(e);
 		}
@@ -1384,30 +1352,29 @@ public class MiniVMCompiler extends GrammarVisitor {
 
 	public void visitRepetition1(Repetition1 e) {
 		e.get(0).visit(this);
-		if (this.option.useFusionInstruction) {
-			if (!optimizeRepetition(e)) {
-//				if (this.option.useStackCaching && checkSC(e.get(0))) {
-//					writeSCRepetitionCode(e);
-//					return;
-//				}
+		if(this.option.useFusionInstruction) {
+			if(!optimizeRepetition(e)) {
+				// if (this.option.useStackCaching && checkSC(e.get(0))) {
+				// writeSCRepetitionCode(e);
+				// return;
+				// }
 				writeRepetitionCode(e);
 			}
 		}
-//		else if (this.option.useStackCaching && checkSC(e.get(0))) {
-//			writeSCRepetitionCode(e);
-//			return;
-//		}
+		// else if (this.option.useStackCaching && checkSC(e.get(0))) {
+		// writeSCRepetitionCode(e);
+		// return;
+		// }
 		else {
 			writeRepetitionCode(e);
 		}
 	}
 
 	public void visitSequence(Sequence e) {
-		for (int i = 0; i < e.size(); i++) {
-			if (this.option.useFusionInstruction) {
+		for(int i = 0; i < e.size(); i++) {
+			if(this.option.useFusionInstruction) {
 				i = writeSequenceCode(e, i, e.size());
-			}
-			else {
+			} else {
 				e.get(i).visit(this);
 			}
 		}
@@ -1417,73 +1384,70 @@ public class MiniVMCompiler extends GrammarVisitor {
 	boolean lastChoiceElementIsUnary = false;
 
 	public void visitChoice(Choice e) {
-		if (this.option.useMappedChoice && optChoiceMode) {
+		if(this.option.useMappedChoice && optChoiceMode) {
 			this.optimizeChoice(e);
 		}
-		if (this.option.useFlowAnalysis) {
-			if (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.UnaryChoice)) {
-				if (this.option.useFusionInstruction) {
+		if(this.option.useFlowAnalysis) {
+			if(this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.UnaryChoice)) {
+				if(this.option.useFusionInstruction) {
 					boolean backTrackFlag = this.backTrackFlag = false;
 					BasicBlock bb = null;
 					BasicBlock fbb = null;
 					BasicBlock endbb = new BasicBlock();
-					for (int i = 0; i < e.size(); i++) {
+					for(int i = 0; i < e.size(); i++) {
 						Expression inner = e.get(i);
-						if (this.analyzer.flowAnalysisMap.get(inner).equals(ExprFlow.Default)) {
+						if(this.analyzer.flowAnalysisMap.get(inner).equals(ExprFlow.Default)) {
 							i = checkWriteChoiceCharset(e, i, bb, fbb, true);
 							backTrackFlag = this.backTrackFlag;
-							if (backTrackFlag) {
+							if(backTrackFlag) {
 								fbb = this.currentFailBB;
 								this.builder.createJUMP(e, endbb);
 								this.popFailureJumpPoint(inner);
 								this.setInsertPoint(fbb);
-								if (i != e.size() - 1) {
+								if(i != e.size() - 1) {
 									this.builder.createSUCC(e);
 									this.builder.createGETpos(e);
 								}
 								this.builder.setCurrentBB(fbb);
 							}
-						}
-						else {
+						} else {
 							fbb = new BasicBlock();
 							this.pushFailureJumpPoint(fbb);
 							inner.visit(this);
-							if (i != e.size() - 1) {
+							if(i != e.size() - 1) {
 								this.builder.createJUMP(e, endbb);
 							}
 							this.popFailureJumpPoint(inner);
 							this.setInsertPoint(fbb);
 						}
 					}
-					if (backTrackFlag) {
+					if(backTrackFlag) {
 						this.builder.createJUMP(e, this.jumpFailureJump());
 						this.setInsertPoint(endbb);
 					}
 					this.backTrackFlag = false;
-				}
-				else {
+				} else {
 					BasicBlock fbb = null;
 					BasicBlock endbb = new BasicBlock();
-					for (int i = 0; i < e.size(); i++) {
+					for(int i = 0; i < e.size(); i++) {
 						Expression inner = e.get(i);
-						if (this.analyzer.flowAnalysisMap.get(inner).equals(ExprFlow.Default)) {
+						if(this.analyzer.flowAnalysisMap.get(inner).equals(ExprFlow.Default)) {
 							fbb = new BasicBlock();
 							this.pushFailureJumpPoint(fbb);
 							e.get(i).visit(this);
 							this.builder.createJUMP(e, endbb);
 							this.popFailureJumpPoint(e.get(i));
 							this.setInsertPoint(fbb);
-							if (i != e.size() - 1) {
+							if(i != e.size() - 1) {
 								this.builder.createSUCC(e);
 								this.builder.createGETpos(e);
 							}
 							this.builder.setCurrentBB(fbb);
-						}
-						else {
+						} else {
 							fbb = new BasicBlock();
 							this.pushFailureJumpPoint(fbb);
 							inner.visit(this);
-							if (i != e.size() - 1) {
+							if(i != e.size() - 1) {
 								this.builder.createJUMP(e, endbb);
 							}
 							this.popFailureJumpPoint(inner);
@@ -1493,10 +1457,11 @@ public class MiniVMCompiler extends GrammarVisitor {
 					this.builder.createJUMP(e, this.jumpFailureJump());
 					this.setInsertPoint(endbb);
 				}
-			}
-			else if (this.option.useFusionInstruction) {
-//				if (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.CharClassChoice)) {
-				if (this.analyzer.checkCharset(e)) {
+			} else if(this.option.useFusionInstruction) {
+				// if
+				// (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.CharClassChoice))
+				// {
+				if(this.analyzer.checkCharset(e)) {
 					writeCharsetCode(e, 0, e.size());
 					return;
 				}
@@ -1506,36 +1471,33 @@ public class MiniVMCompiler extends GrammarVisitor {
 				BasicBlock endbb = new BasicBlock();
 				BasicBlock mergebb = new BasicBlock();
 				this.builder.createPUSHpos(e);
-				for (int i = 0; i < e.size(); i++) {
+				for(int i = 0; i < e.size(); i++) {
 					Expression inner = e.get(i);
-					if (this.analyzer.flowAnalysisMap.get(inner).equals(ExprFlow.Default)) {
+					if(this.analyzer.flowAnalysisMap.get(inner).equals(ExprFlow.Default)) {
 						i = checkWriteChoiceCharset(e, i, bb, fbb, false);
 						backTrackFlag = this.backTrackFlag;
-						if (backTrackFlag) {
+						if(backTrackFlag) {
 							fbb = this.currentFailBB;
 							this.builder.createJUMP(e, endbb);
 							this.popFailureJumpPoint(inner);
 							this.setInsertPoint(fbb);
-							if (i != e.size() - 1) {
+							if(i != e.size() - 1) {
 								this.builder.createSUCC(e);
 								this.builder.createGETpos(e);
-							}
-							else {
+							} else {
 								this.builder.createSTOREpos(e);
 							}
 							this.builder.setCurrentBB(fbb);
 						}
-					}
-					else {
+					} else {
 						fbb = new BasicBlock();
-						if (i == e.size() - 1) {
+						if(i == e.size() - 1) {
 							this.lastChoiceElementIsUnary = true;
-						}
-						else {
+						} else {
 							this.pushFailureJumpPoint(fbb);
 						}
 						inner.visit(this);
-						if (i != e.size() - 1) {
+						if(i != e.size() - 1) {
 							this.builder.createJUMP(e, endbb);
 							this.popFailureJumpPoint(inner);
 							this.setInsertPoint(fbb);
@@ -1543,11 +1505,10 @@ public class MiniVMCompiler extends GrammarVisitor {
 						this.setInsertPoint(fbb);
 					}
 				}
-				if (backTrackFlag) {
-					if (!this.lastChoiceElementIsUnary) {
+				if(backTrackFlag) {
+					if(!this.lastChoiceElementIsUnary) {
 						this.builder.createJUMP(e, this.jumpFailureJump());
-					}
-					else {
+					} else {
 						this.lastChoiceElementIsUnary = false;
 					}
 					this.setInsertPoint(endbb);
@@ -1555,61 +1516,57 @@ public class MiniVMCompiler extends GrammarVisitor {
 					this.setInsertPoint(mergebb);
 				}
 				this.backTrackFlag = false;
-			}
-			else {
+			} else {
 				BasicBlock fbb = null;
 				BasicBlock endbb = new BasicBlock();
 				BasicBlock mergebb = new BasicBlock();
 				this.builder.createPUSHpos(e);
-				for (int i = 0; i < e.size(); i++) {
+				for(int i = 0; i < e.size(); i++) {
 					Expression inner = e.get(i);
-					if (this.analyzer.flowAnalysisMap.get(inner).equals(ExprFlow.Default)) {
+					if(this.analyzer.flowAnalysisMap.get(inner).equals(ExprFlow.Default)) {
 						fbb = new BasicBlock();
 						this.pushFailureJumpPoint(fbb);
 						e.get(i).visit(this);
 						this.builder.createJUMP(e, endbb);
 						this.popFailureJumpPoint(e.get(i));
 						this.setInsertPoint(fbb);
-						if (i != e.size() - 1) {
+						if(i != e.size() - 1) {
 							this.builder.createSUCC(e);
 							this.builder.createGETpos(e);
-						}
-						else {
+						} else {
 							this.builder.createSTOREpos(e);
 						}
 						this.builder.setCurrentBB(fbb);
-					}
-					else {
+					} else {
 						fbb = new BasicBlock();
-						if (i == e.size() - 1) {
+						if(i == e.size() - 1) {
 							this.lastChoiceElementIsUnary = true;
-						}
-						else {
+						} else {
 							this.pushFailureJumpPoint(fbb);
 						}
 						inner.visit(this);
-						if (i != e.size() - 1) {
+						if(i != e.size() - 1) {
 							this.builder.createJUMP(e, endbb);
 							this.popFailureJumpPoint(inner);
 							this.setInsertPoint(fbb);
 						}
 					}
 				}
-				if (!this.lastChoiceElementIsUnary) {
+				if(!this.lastChoiceElementIsUnary) {
 					this.builder.createJUMP(e, this.jumpFailureJump());
-				}
-				else {
+				} else {
 					this.lastChoiceElementIsUnary = false;
 				}
 				this.setInsertPoint(endbb);
 				this.builder.createPOPpos(e);
 				this.setInsertPoint(mergebb);
 			}
-		}
-		else {
-			if (this.option.useFusionInstruction) {
-//				if (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.CharClassChoice)) {
-				if (this.analyzer.checkCharset(e)) {
+		} else {
+			if(this.option.useFusionInstruction) {
+				// if
+				// (this.analyzer.flowAnalysisMap.get(e).equals(ExprFlow.CharClassChoice))
+				// {
+				if(this.analyzer.checkCharset(e)) {
 					writeCharsetCode(e, 0, e.size());
 					return;
 				}
@@ -1619,50 +1576,47 @@ public class MiniVMCompiler extends GrammarVisitor {
 				BasicBlock endbb = new BasicBlock();
 				BasicBlock mergebb = new BasicBlock();
 				this.builder.createPUSHpos(e);
-				for (int i = 0; i < e.size(); i++) {
+				for(int i = 0; i < e.size(); i++) {
 					Expression inner = e.get(i);
 					i = checkWriteChoiceCharset(e, i, bb, fbb, false);
 					backTrackFlag = this.backTrackFlag;
-					if (backTrackFlag) {
+					if(backTrackFlag) {
 						fbb = this.currentFailBB;
 						this.builder.createJUMP(e, endbb);
 						this.popFailureJumpPoint(inner);
 						this.setInsertPoint(fbb);
-						if (i != e.size() - 1) {
+						if(i != e.size() - 1) {
 							this.builder.createSUCC(e);
 							this.builder.createGETpos(e);
-						}
-						else {
+						} else {
 							this.builder.createSTOREpos(e);
 						}
 						this.builder.setCurrentBB(fbb);
 					}
 				}
-				if (backTrackFlag) {
+				if(backTrackFlag) {
 					this.builder.createJUMP(e, this.jumpFailureJump());
 					this.setInsertPoint(endbb);
 					this.builder.createPOPpos(e);
 					this.setInsertPoint(mergebb);
 				}
 				this.backTrackFlag = false;
-			}
-			else {
+			} else {
 				BasicBlock fbb = null;
 				BasicBlock endbb = new BasicBlock();
 				BasicBlock mergebb = new BasicBlock();
 				this.builder.createPUSHpos(e);
-				for (int i = 0; i < e.size(); i++) {
+				for(int i = 0; i < e.size(); i++) {
 					fbb = new BasicBlock();
 					this.pushFailureJumpPoint(fbb);
 					e.get(i).visit(this);
 					this.builder.createJUMP(e, endbb);
 					this.popFailureJumpPoint(e.get(i));
 					this.setInsertPoint(fbb);
-					if (i != e.size() - 1) {
+					if(i != e.size() - 1) {
 						this.builder.createSUCC(e);
 						this.builder.createGETpos(e);
-					}
-					else {
+					} else {
 						this.builder.createSTOREpos(e);
 					}
 					this.builder.setCurrentBB(fbb);
@@ -1676,100 +1630,100 @@ public class MiniVMCompiler extends GrammarVisitor {
 	}
 
 	public void visitNew(New e) {
-//		if (PatternMatching) {
-//			for (int i = 0; i < e.size(); i++) {
-//				if (this.option.useFusionInstruction) {
-//					i = writeSequenceCode(e, i, e.size());
-//				}
-//				else {
-//					e.get(i).visit(this);
-//				}
-//			}
-//		}
-//		else {
-//			BasicBlock fbb = new BasicBlock();
-//			this.pushFailureJumpPoint(fbb);
-//			if (e.lefted) {
-//				this.builder.createLEFTJOIN(e, 0);
-//			}
-//			else {
-//				this.builder.createNEW(e);
-//			}
-//		}
+		// if (PatternMatching) {
+		// for (int i = 0; i < e.size(); i++) {
+		// if (this.option.useFusionInstruction) {
+		// i = writeSequenceCode(e, i, e.size());
+		// }
+		// else {
+		// e.get(i).visit(this);
+		// }
+		// }
+		// }
+		// else {
+		// BasicBlock fbb = new BasicBlock();
+		// this.pushFailureJumpPoint(fbb);
+		// if (e.lefted) {
+		// this.builder.createLEFTJOIN(e, 0);
+		// }
+		// else {
+		// this.builder.createNEW(e);
+		// }
+		// }
 	}
 
 	public void visitCapture(Capture e) {
-//		if (!PatternMatching) {
-//			BasicBlock mergebb = new BasicBlock();
-//			this.builder.createCAPTURE(e);
-//			this.builder.createPOPpos(e);
-//			this.builder.createJUMP(e, mergebb);
-//			BasicBlock fbb = this.popFailureJumpPoint(e);
-//			this.setInsertPoint(fbb);
-//			this.builder.createABORT(e);
-//			this.builder.createJUMP(e, this.jumpFailureJump());
-//			this.setInsertPoint(mergebb);
-//			this.builder.setCurrentBB(mergebb);
-//		}
+		// if (!PatternMatching) {
+		// BasicBlock mergebb = new BasicBlock();
+		// this.builder.createCAPTURE(e);
+		// this.builder.createPOPpos(e);
+		// this.builder.createJUMP(e, mergebb);
+		// BasicBlock fbb = this.popFailureJumpPoint(e);
+		// this.setInsertPoint(fbb);
+		// this.builder.createABORT(e);
+		// this.builder.createJUMP(e, this.jumpFailureJump());
+		// this.setInsertPoint(mergebb);
+		// this.builder.setCurrentBB(mergebb);
+		// }
 	}
 
 	public void visitLink(Link e) {
-		if (PatternMatching) {
+		if(PatternMatching) {
 			e.get(0).visit(this);
 		}
-//		else if (this.PackratParsing) {
-//			BasicBlock fbb = new BasicBlock();
-//			BasicBlock mergebb = new BasicBlock();
-//			this.pushFailureJumpPoint(fbb);
-//			Expression ref = Factory.resolveNonTerminal(e.get(0));
-//			MemoPoint m = this.issueMemoPoint(e.toString(), ref);
-//			if (m != null) {
-//				this.builder.createLOOKUPNODE(e, mergebb, m.id, e.index);
-//			}
-//			this.builder.createPUSHmark(e);
-//			e.get(0).visit(this);
-//			this.builder.createCOMMIT(e, e.index);
-//			if (m != null) {
-//				this.builder.createMEMOIZENODE(e, m.id);
-//			}
-//			this.builder.createJUMP(e, mergebb);
-//			this.popFailureJumpPoint(e);
-//			this.setInsertPoint(fbb);
-//			this.builder.createABORT(e);
-//			if (m != null) {
-//				this.builder.createMEMOIZENODE(e, m.id);
-//			}
-//			this.builder.createJUMP(e, this.jumpFailureJump());
-//			this.setInsertPoint(mergebb);
-//			this.builder.setCurrentBB(mergebb);
-//		}
-//		else {
-//			BasicBlock fbb = new BasicBlock();
-//			BasicBlock mergebb = new BasicBlock();
-//			this.pushFailureJumpPoint(fbb);
-//			this.builder.createPUSHmark(e);
-//			e.get(0).visit(this);
-//			this.builder.createCOMMIT(e, e.index);
-//			this.builder.createJUMP(e, mergebb);
-//			this.popFailureJumpPoint(e);
-//			this.setInsertPoint(fbb);
-//			this.builder.createABORT(e);
-//			this.builder.createJUMP(e, this.jumpFailureJump());
-//			this.setInsertPoint(mergebb);
-//			this.builder.setCurrentBB(mergebb);
-//		}
+		// else if (this.PackratParsing) {
+		// BasicBlock fbb = new BasicBlock();
+		// BasicBlock mergebb = new BasicBlock();
+		// this.pushFailureJumpPoint(fbb);
+		// Expression ref = Factory.resolveNonTerminal(e.get(0));
+		// MemoPoint m = this.issueMemoPoint(e.toString(), ref);
+		// if (m != null) {
+		// this.builder.createLOOKUPNODE(e, mergebb, m.id, e.index);
+		// }
+		// this.builder.createPUSHmark(e);
+		// e.get(0).visit(this);
+		// this.builder.createCOMMIT(e, e.index);
+		// if (m != null) {
+		// this.builder.createMEMOIZENODE(e, m.id);
+		// }
+		// this.builder.createJUMP(e, mergebb);
+		// this.popFailureJumpPoint(e);
+		// this.setInsertPoint(fbb);
+		// this.builder.createABORT(e);
+		// if (m != null) {
+		// this.builder.createMEMOIZENODE(e, m.id);
+		// }
+		// this.builder.createJUMP(e, this.jumpFailureJump());
+		// this.setInsertPoint(mergebb);
+		// this.builder.setCurrentBB(mergebb);
+		// }
+		// else {
+		// BasicBlock fbb = new BasicBlock();
+		// BasicBlock mergebb = new BasicBlock();
+		// this.pushFailureJumpPoint(fbb);
+		// this.builder.createPUSHmark(e);
+		// e.get(0).visit(this);
+		// this.builder.createCOMMIT(e, e.index);
+		// this.builder.createJUMP(e, mergebb);
+		// this.popFailureJumpPoint(e);
+		// this.setInsertPoint(fbb);
+		// this.builder.createABORT(e);
+		// this.builder.createJUMP(e, this.jumpFailureJump());
+		// this.setInsertPoint(mergebb);
+		// this.builder.setCurrentBB(mergebb);
+		// }
 	}
 
 	public void visitTagging(Tagging e) {
-//		if (!this.PatternMatching) {
-//			this.builder.createTAG(e, "#" + e.tag.toString());
-//		}
+		// if (!this.PatternMatching) {
+		// this.builder.createTAG(e, "#" + e.tag.toString());
+		// }
 	}
 
 	public void visitReplace(Replace e) {
-//		if (!this.PatternMatching) {
-//			this.builder.createVALUE(e, e.value);
-//		}
+		// if (!this.PatternMatching) {
+		// this.builder.createVALUE(e, e.value);
+		// }
 	}
 
 	@Override
